@@ -19,7 +19,8 @@
           "longDescription": "Adobe Photoshop هو المعيار الصناعي في تحرير الرسومات النقطية. يتيح للمستخدمين إنشاء وتعديل الصور والأعمال الفنية الرقمية. يستخدم على نطاق واسع من قبل المصورين والمصممين ومحترفي الويب.",
           "image": "https://i.imgur.com/YQ5N1r1.png",
           "downloadUrl": "#",
-          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "postAdUrl": "https://sam-developer.com/support"
         },
         {
           "id": "prog2",

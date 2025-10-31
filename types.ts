@@ -12,6 +12,7 @@ export interface Program {
   image: string;
   downloadUrl: string;
   adUrl: string;
+  postAdUrl?: string;
 }
 
 export interface Category {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Program } from '../types';
-import { DownloadIcon, BackIcon, VideoIcon, CloseIcon } from './Icons';
+import { DownloadIcon, BackIcon, VideoIcon, CloseIcon, ExternalLinkIcon } from './Icons';
 
 const getYouTubeEmbedUrl = (url: string) => {
     if (!url) return null;
@@ -13,9 +13,6 @@ const getYouTubeEmbedUrl = (url: string) => {
     const videoId = match ? match[1] : null;
 
     if (videoId) {
-        // Using a simpler, more robust embed URL to avoid player errors.
-        // autoplay=1 requires mute=1 in most modern browsers.
-        // loop=1 with playlist=videoId is the correct way to loop a single video.
         return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
     }
 
@@ -28,26 +25,57 @@ const AdGateModal: React.FC<{
   onClose: () => void;
   downloadUrl: string;
   adUrl: string;
-}> = ({ isOpen, onClose, downloadUrl, adUrl }) => {
+  postAdUrl?: string;
+}> = ({ isOpen, onClose, downloadUrl, adUrl, postAdUrl }) => {
     const [countdown, setCountdown] = useState(20);
-    const isReady = countdown <= 0;
+    const [step, setStep] = useState<'counting' | 'postAd' | 'download'>('counting');
     const embedUrl = getYouTubeEmbedUrl(adUrl);
 
+    const isTimerRunning = countdown > 0 && step === 'counting';
+    const canClose = step !== 'counting';
+
     useEffect(() => {
-        if (!isOpen || isReady) return;
+        if (isOpen) {
+            setCountdown(20);
+            setStep('counting');
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen || !isTimerRunning) return;
 
         const timer = setInterval(() => {
             setCountdown(prev => (prev > 0 ? prev - 1 : 0));
         }, 1000);
         
         return () => clearInterval(timer);
-    }, [isOpen, isReady]);
+    }, [isOpen, isTimerRunning]);
 
     useEffect(() => {
-        if (isOpen) {
-            setCountdown(20); // Reset timer when modal opens
+        if (countdown <= 0 && step === 'counting') {
+            if (postAdUrl) {
+                setStep('postAd');
+            } else {
+                setStep('download');
+            }
         }
-    }, [isOpen]);
+    }, [countdown, step, postAdUrl]);
+
+    const handlePostAdClick = () => {
+        if(postAdUrl) {
+            window.open(postAdUrl, '_blank', 'noopener,noreferrer');
+        }
+        setStep('download');
+    };
+
+    const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (step !== 'download') {
+            e.preventDefault();
+        } else {
+            onClose();
+        }
+    };
+
 
     return (
         <AnimatePresence>
@@ -57,7 +85,7 @@ const AdGateModal: React.FC<{
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-                    onClick={isReady ? onClose : undefined} // Prevent closing via backdrop during countdown
+                    onClick={canClose ? onClose : undefined}
                 >
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
@@ -67,8 +95,7 @@ const AdGateModal: React.FC<{
                         className="bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl w-full max-w-lg relative"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* The close button is only shown when the countdown is finished */}
-                        {isReady && (
+                        {canClose && (
                            <motion.button
                                 initial={{ opacity: 0, scale: 0.5 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -101,35 +128,51 @@ const AdGateModal: React.FC<{
                             </div>
                             
                             <div className="h-16 flex items-center justify-center">
-                                {isReady ? (
-                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-green-400 font-semibold text-lg">الرابط جاهز للتحميل!</motion.p>
-                                ) : (
+                                {step === 'counting' && (
                                     <p className="text-center text-yellow-400 text-lg">
                                         نرجو الانتظار <span className="font-bold text-xl tabular-nums">{countdown}</span> ثانية لتوجيهكم لرابط التحميل...
                                     </p>
                                 )}
+                                {step === 'postAd' && (
+                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-blue-400 font-semibold text-lg">الخطوة التالية: يرجى زيارة رابط الإعلان.</motion.p>
+                                )}
+                                {step === 'download' && (
+                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-green-400 font-semibold text-lg">الرابط جاهز للتحميل!</motion.p>
+                                )}
                             </div>
                             
-                            <a
-                                href={isReady ? downloadUrl : undefined}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 ${
-                                    isReady
-                                    ? 'bg-green-600 text-white hover:bg-green-700 hover:scale-105 shadow-lg'
-                                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                }`}
-                                onClick={(e) => {
-                                    if (!isReady) {
-                                      e.preventDefault();
-                                    } else {
-                                      onClose();
-                                    }
-                                }}
-                            >
-                                <DownloadIcon />
-                                <span>{isReady ? 'اضغط هنا للتحميل' : 'الرجاء الانتظار...'}</span>
-                            </a>
+                            <div className="w-full">
+                                {step === 'counting' && (
+                                    <button
+                                        disabled
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all bg-gray-600 text-gray-400 cursor-not-allowed"
+                                    >
+                                        <DownloadIcon />
+                                        <span>الرجاء الانتظار...</span>
+                                    </button>
+                                )}
+                                {step === 'postAd' && (
+                                    <button
+                                        onClick={handlePostAdClick}
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-lg"
+                                    >
+                                        <ExternalLinkIcon />
+                                        <span>الانتقال إلى رابط الإعلان</span>
+                                    </button>
+                                )}
+                                {step === 'download' && (
+                                    <a
+                                        href={downloadUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-green-500 bg-green-600 text-white hover:bg-green-700 hover:scale-105 shadow-lg"
+                                        onClick={handleDownloadClick}
+                                    >
+                                        <DownloadIcon />
+                                        <span>اضغط هنا للتحميل</span>
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -138,7 +181,6 @@ const AdGateModal: React.FC<{
     );
 };
 
-// FIX: Define ProgramPageProps interface
 interface ProgramPageProps {
   findProgramBySlug: (slug: string) => (Program & { categoryName: string }) | undefined;
 }
@@ -206,6 +248,7 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
         onClose={() => setIsAdModalOpen(false)}
         downloadUrl={program.downloadUrl}
         adUrl={program.adUrl}
+        postAdUrl={program.postAdUrl}
       />
     </>
   );

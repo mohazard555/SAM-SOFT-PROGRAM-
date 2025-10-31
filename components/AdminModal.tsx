@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program } from '../types';
@@ -83,7 +82,8 @@ const AdminPanel: React.FC<{
             longDescription: "وصف طويل",
             image: "https://via.placeholder.com/128",
             downloadUrl: "#",
-            adUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            adUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            postAdUrl: ""
         };
         const newCategories = [...currentConfig.categories];
         newCategories[catIndex].programs.push(newProgram);
@@ -170,6 +170,7 @@ const AdminPanel: React.FC<{
                                         <Input name="shortDescription" placeholder="وصف قصير" value={prog.shortDescription} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="downloadUrl" placeholder="رابط التحميل المباشر" value={prog.downloadUrl} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="adUrl" placeholder="رابط فيديو الإعلان (YouTube)" value={prog.adUrl} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
+                                        <Input name="postAdUrl" placeholder="رابط بعد الإعلان (اختياري)" value={prog.postAdUrl || ''} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <div>
                                             <label className="block text-sm text-gray-400 mb-1">صورة البرنامج</label>
                                             <div className="flex items-center gap-2">
