@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program } from '../types';
-import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon } from './Icons';
+import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon, DownloadIcon, UserCogIcon } from './Icons';
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -41,9 +41,21 @@ const AdminPanel: React.FC<{
     saveConfig: () => void;
     logout: () => void;
 }> = ({ currentConfig, setConfig, saveConfig, logout }) => {
+    const importInputRef = useRef<HTMLInputElement>(null);
 
     const handleSiteInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setConfig(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleAdminChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setConfig(prev => ({
+            ...prev,
+            admin: {
+                ...prev.admin,
+                [name]: value
+            }
+        }));
     };
     
     const handleCategoryChange = (catIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,22 +109,64 @@ const AdminPanel: React.FC<{
             setConfig(prev => ({...prev, categories: newCategories}));
         }
     };
+    
+    const handleImportClick = () => {
+        importInputRef.current?.click();
+    };
+
+    const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target?.result;
+                if (typeof text !== 'string') throw new Error("File content is not readable");
+                const importedConfig = JSON.parse(text);
+                // Basic validation
+                if (!importedConfig.siteName || !importedConfig.categories || !importedConfig.admin) {
+                    throw new Error("Invalid config file structure.");
+                }
+                setConfig(importedConfig);
+                alert("تم استيراد الإعدادات بنجاح!");
+            } catch (error) {
+                console.error("Failed to import config:", error);
+                alert(`فشل استيراد الملف. تأكد من أنه ملف JSON صالح. الخطأ: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+        };
+        reader.onerror = () => {
+             alert(`فشل قراءة الملف.`);
+        }
+        reader.readAsText(file);
+        e.target.value = '';
+    };
 
 
     return (
         <div className="text-white p-2 sm:p-6 space-y-6">
-            <div className="flex justify-between items-center">
+            <input
+                type="file"
+                ref={importInputRef}
+                className="hidden"
+                accept="application/json"
+                onChange={handleFileImport}
+            />
+            <div className="flex justify-between items-center flex-wrap gap-2">
                 <h2 className="text-2xl font-bold">لوحة التحكم</h2>
-                <div>
-                     <button onClick={logout} className="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">تسجيل الخروج</button>
-                    <button onClick={saveConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
-                        <SaveIcon />
-                        <span>حفظ وتنزيل config.json</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                     <button onClick={handleImportClick} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                        <UploadIcon />
+                        <span>استيراد الإعدادات</span>
                     </button>
+                    <button onClick={saveConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                        <DownloadIcon />
+                        <span>تصدير الإعدادات</span>
+                    </button>
+                    <button onClick={logout} className="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">تسجيل الخروج</button>
                 </div>
             </div>
             
-            {/* Site Info */}
             <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-semibold mb-3">معلومات الموقع</h3>
                 <div className="space-y-4">
@@ -143,9 +197,25 @@ const AdminPanel: React.FC<{
                 </div>
             </div>
 
-            {/* Categories */}
+            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><UserCogIcon/> <span>إعدادات المدير</span></h3>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm text-gray-400">اسم المستخدم</label>
+                        <Input name="username" value={currentConfig.admin.username} onChange={handleAdminChange} />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-gray-400">كلمة المرور</label>
+                        <Input name="password" type="password" value={currentConfig.admin.password || ''} onChange={handleAdminChange} />
+                         <p className="text-xs text-gray-500 mt-1">
+                            تنبيه: عند تغيير اسم المستخدم أو كلمة المرور، ستحتاج إلى استخدام البيانات الجديدة لتسجيل الدخول في المرة القادمة.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div className="space-y-4">
-                 <div className="flex justify-between items-center">
+                 <div className="flex justify-between items-center pt-4 border-t border-gray-700">
                     <h3 className="text-xl font-bold">الفئات والبرامج</h3>
                     <button onClick={addCategory} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-md transition-colors inline-flex items-center gap-2">
                         <PlusIcon />
@@ -158,7 +228,6 @@ const AdminPanel: React.FC<{
                             <input name="name" value={cat.name} onChange={(e) => handleCategoryChange(catIndex, e)} className="text-lg font-semibold bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none"/>
                             <button onClick={() => deleteCategory(catIndex)} className="text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
                         </div>
-                        {/* Programs */}
                         <div className="space-y-3 pl-4 border-r-2 border-gray-600">
                             {cat.programs.map((prog, progIndex) => (
                                 <div key={prog.id} className="bg-gray-900/50 p-3 rounded-md">
@@ -250,7 +319,6 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, config, setCon
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   
-  // Reset auth state when modal is closed
   useEffect(() => {
       if(!isOpen) {
           setIsAuthenticated(false);
