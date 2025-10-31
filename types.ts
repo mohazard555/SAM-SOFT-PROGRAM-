@@ -1,4 +1,3 @@
-
 export interface AdminCredentials {
   username: string;
   password?: string;
@@ -13,6 +12,7 @@ export interface Program {
   downloadUrl: string;
   adUrl: string;
   postAdUrl?: string;
+  badge?: string;
 }
 
 export interface Category {
@@ -36,4 +36,6 @@ export interface Config {
   admin: AdminCredentials;
   categories: Category[];
   ads: Ad[];
+  siteAbout?: string;
+  advertiseInfo?: string;
 }

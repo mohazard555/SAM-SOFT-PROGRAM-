@@ -1,43 +1,28 @@
-
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { Config, Category, Program } from '../types';
-import { SearchIcon, CategoryIcon, DownloadIcon } from './Icons';
+import { SearchIcon, CategoryIcon, InfoIcon, MessageCircleIcon } from './Icons';
+import InfoModal from './InfoModal';
 
 interface HomePageProps {
   config: Config;
   slugify: (text: string) => string;
 }
 
-const Tooltip: React.FC<{ text: string }> = ({ text }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 10 }}
-        transition={{ duration: 0.2 }}
-        className="absolute bottom-full mb-2 w-max max-w-xs p-2 text-sm bg-gray-900 text-white rounded-md shadow-lg z-50 border border-gray-700"
-    >
-        {text}
-    </motion.div>
-);
-
 const ProgramItem: React.FC<{ program: Program; slug: string }> = ({ program, slug }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
     return (
-        <div 
-            className="relative"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <Link to={`/program/${slug}`} className="block text-blue-400 hover:text-blue-300 hover:underline transition-colors">
-                {program.name}
-            </Link>
-            <AnimatePresence>
-                {isHovered && <Tooltip text={program.shortDescription} />}
-            </AnimatePresence>
-        </div>
+        <Link to={`/program/${slug}`} className="block text-gray-300 hover:text-white transition-colors group">
+            <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-medium text-blue-400 group-hover:underline">{program.name}</span>
+                {program.badge && (
+                    <span className="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded-full">
+                        {program.badge}
+                    </span>
+                )}
+                <span className="text-sm text-gray-500">- {program.shortDescription}</span>
+            </div>
+        </Link>
     );
 };
 
@@ -64,6 +49,7 @@ const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => st
 
 const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [modalData, setModalData] = useState<{ title: string; content: string } | null>(null);
 
   const filteredCategories = useMemo(() => {
     if (!searchQuery) {
@@ -74,7 +60,8 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
     return config.categories
       .map(category => {
         const filteredPrograms = category.programs.filter(program =>
-          program.name.toLowerCase().includes(lowercasedQuery)
+          program.name.toLowerCase().includes(lowercasedQuery) ||
+          program.shortDescription.toLowerCase().includes(lowercasedQuery)
         );
         
         if (filteredPrograms.length > 0) {
@@ -105,6 +92,25 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
         </div>
       </div>
       
+      <div className="flex justify-center items-center gap-6 text-gray-400">
+        <button 
+            onClick={() => setModalData({ title: 'حول الموقع', content: config.siteAbout || 'لا يوجد وصف متاح حالياً.' })}
+            className="flex items-center gap-2 hover:text-blue-400 transition-colors"
+            aria-label="عرض معلومات حول الموقع"
+        >
+            <InfoIcon />
+            <span>حول الموقع</span>
+        </button>
+        <button 
+            onClick={() => setModalData({ title: 'أعلن معنا', content: config.advertiseInfo || 'معلومات الإعلان غير متاحة حالياً.' })}
+            className="flex items-center gap-2 hover:text-blue-400 transition-colors"
+            aria-label="عرض معلومات الإعلان"
+        >
+            <MessageCircleIcon />
+            <span>أعلن معنا</span>
+        </button>
+      </div>
+
       <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredCategories.map(category => (
           <CategoryCard key={category.id} category={category} slugify={slugify} />
@@ -116,6 +122,12 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
             <p>حاول البحث بكلمات أخرى.</p>
         </div>
       )}
+      <InfoModal 
+        isOpen={!!modalData}
+        onClose={() => setModalData(null)}
+        title={modalData?.title || ''}
+        content={modalData?.content || ''}
+      />
     </div>
   );
 };

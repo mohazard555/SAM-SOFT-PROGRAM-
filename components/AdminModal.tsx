@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program, Ad } from '../types';
@@ -44,7 +43,7 @@ const AdminPanel: React.FC<{
 }> = ({ currentConfig, setConfig, saveConfig, logout }) => {
     const importInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSiteInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSiteInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setConfig(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
@@ -120,7 +119,8 @@ const AdminPanel: React.FC<{
             image: "https://via.placeholder.com/128",
             downloadUrl: "#",
             adUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            postAdUrl: ""
+            postAdUrl: "",
+            badge: ""
         };
         const newCategories = [...currentConfig.categories];
         newCategories[catIndex].programs.push(newProgram);
@@ -219,6 +219,14 @@ const AdminPanel: React.FC<{
                         <label className="block text-sm text-gray-400">اسم المطور</label>
                         <Input name="developer" value={currentConfig.developer} onChange={handleSiteInfoChange} />
                     </div>
+                     <div>
+                        <label className="block text-sm text-gray-400">حول الموقع</label>
+                        <Textarea name="siteAbout" value={currentConfig.siteAbout || ''} onChange={handleSiteInfoChange} rows={4} />
+                    </div>
+                    <div>
+                        <label className="block text-sm text-gray-400">معلومات (أعلن معنا)</label>
+                        <Textarea name="advertiseInfo" value={currentConfig.advertiseInfo || ''} onChange={handleSiteInfoChange} rows={4} />
+                    </div>
                 </div>
             </div>
 
@@ -306,6 +314,7 @@ const AdminPanel: React.FC<{
                                         <button onClick={() => deleteProgram(catIndex, progIndex)} className="text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
                                     </div>
                                     <div className="space-y-2 text-sm">
+                                        <Input name="badge" placeholder="كلمة مميزة (مثل: جديد)" value={prog.badge || ''} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="shortDescription" placeholder="وصف قصير" value={prog.shortDescription} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="downloadUrl" placeholder="رابط التحميل المباشر" value={prog.downloadUrl} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="adUrl" placeholder="رابط فيديو الإعلان (YouTube)" value={prog.adUrl} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
