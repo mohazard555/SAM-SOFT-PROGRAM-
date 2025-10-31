@@ -21,10 +21,19 @@ export interface Category {
   programs: Program[];
 }
 
+export interface Ad {
+  id: string;
+  name: string;
+  description: string;
+  link: string;
+  image: string;
+}
+
 export interface Config {
   siteName: string;
   siteLogo: string;
   developer: string;
   admin: AdminCredentials;
   categories: Category[];
+  ads: Ad[];
 }

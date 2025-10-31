@@ -7,6 +7,15 @@
     "username": "admin",
     "password": "123"
   },
+  "ads": [
+    {
+      "id": "ad1_171554_2584",
+      "name": "Support Sam Developer!",
+      "description": "If you like this website, consider supporting the developer to keep it running.",
+      "link": "https://sam-developer.com",
+      "image": "https://i.imgur.com/O1hP4Yx.png"
+    }
+  ],
   "categories": [
     {
       "id": "cat1",

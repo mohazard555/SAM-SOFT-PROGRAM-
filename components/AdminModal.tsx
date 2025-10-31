@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Config, AdminCredentials, Category, Program } from '../types';
-import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon, DownloadIcon, UserCogIcon } from './Icons';
+import type { Config, AdminCredentials, Category, Program, Ad } from '../types';
+import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon, DownloadIcon, UserCogIcon, MegaphoneIcon } from './Icons';
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -56,6 +57,30 @@ const AdminPanel: React.FC<{
                 [name]: value
             }
         }));
+    };
+
+    const handleAdChange = (adIndex: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const newAds = [...currentConfig.ads];
+        newAds[adIndex] = { ...newAds[adIndex], [e.target.name]: e.target.value };
+        setConfig(prev => ({ ...prev, ads: newAds }));
+    };
+
+    const addAd = () => {
+        const newAd: Ad = {
+            id: `ad${Date.now()}`,
+            name: "إعلان جديد",
+            description: "وصف الإعلان هنا",
+            link: "#",
+            image: "https://via.placeholder.com/150",
+        };
+        setConfig(prev => ({ ...prev, ads: [...(prev.ads || []), newAd] }));
+    };
+
+    const deleteAd = (adIndex: number) => {
+        if (window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
+            const newAds = currentConfig.ads.filter((_, i) => i !== adIndex);
+            setConfig(prev => ({ ...prev, ads: newAds }));
+        }
     };
     
     const handleCategoryChange = (catIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,6 +236,51 @@ const AdminPanel: React.FC<{
                             تنبيه: عند تغيير اسم المستخدم أو كلمة المرور، ستحتاج إلى استخدام البيانات الجديدة لتسجيل الدخول في المرة القادمة.
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><MegaphoneIcon /> <span>الإعلانات الخاصة</span></h3>
+                <div className="space-y-4">
+                    {(currentConfig.ads || []).map((ad, adIndex) => (
+                        <div key={ad.id} className="bg-gray-900/50 p-3 rounded-md space-y-2 relative">
+                            <button onClick={() => deleteAd(adIndex)} className="absolute top-2 left-2 text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
+                            <div>
+                                <label className="block text-sm text-gray-400">اسم الإعلان</label>
+                                <Input name="name" value={ad.name} onChange={(e) => handleAdChange(adIndex, e)} />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-400">وصف الإعلان</label>
+                                <Textarea name="description" value={ad.description} onChange={(e) => handleAdChange(adIndex, e)} rows={2} />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-400">رابط الإعلان</label>
+                                <Input name="link" value={ad.link} onChange={(e) => handleAdChange(adIndex, e)} />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-400 mb-1">صورة الإعلان</label>
+                                <div className="flex items-center gap-2">
+                                    <img src={ad.image} alt={ad.name} className="w-16 h-10 object-cover rounded bg-gray-700 p-1" />
+                                    <label className="cursor-pointer text-xs bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded-md transition-colors inline-flex items-center gap-1">
+                                        <UploadIcon />
+                                        <span>تغيير</span>
+                                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                const base64 = await fileToBase64(e.target.files[0]);
+                                                const newAds = [...currentConfig.ads];
+                                                newAds[adIndex].image = base64;
+                                                setConfig(prev => ({ ...prev, ads: newAds }));
+                                            }
+                                        }} />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    <button onClick={addAd} className="mt-2 text-sm bg-green-600/50 hover:bg-green-600 text-white py-1 px-3 rounded-md transition-colors inline-flex items-center gap-1">
+                        <PlusIcon />
+                        <span>إضافة إعلان</span>
+                    </button>
                 </div>
             </div>
 

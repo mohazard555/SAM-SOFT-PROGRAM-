@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export const SearchIcon: React.FC = () => (
@@ -93,5 +94,12 @@ export const UserCogIcon: React.FC = () => (
         <rect width="18" height="18" x="3" y="4" rx="2"></rect>
         <circle cx="8.5" cy="11.5" r=".5" fill="currentColor"></circle>
         <circle cx="15.5" cy="11.5" r=".5" fill="currentColor"></circle>
+    </svg>
+);
+
+export const MegaphoneIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m3 11 18-5v12L3 14v-3z"></path>
+        <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
     </svg>
 );
