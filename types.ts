@@ -1,0 +1,29 @@
+
+export interface AdminCredentials {
+  username: string;
+  password?: string;
+}
+
+export interface Program {
+  id: string;
+  name: string;
+  shortDescription: string;
+  longDescription: string;
+  image: string;
+  downloadUrl: string;
+  adUrl: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  programs: Program[];
+}
+
+export interface Config {
+  siteName: string;
+  siteLogo: string;
+  developer: string;
+  admin: AdminCredentials;
+  categories: Category[];
+}

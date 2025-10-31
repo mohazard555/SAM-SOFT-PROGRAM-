@@ -1,0 +1,108 @@
+
+{
+  "siteName": "SAM SOFT PROGRAM 2025",
+  "siteLogo": "https://i.imgur.com/g4zB5cT.png",
+  "developer": "Sam Developer",
+  "admin": {
+    "username": "admin",
+    "password": "123"
+  },
+  "categories": [
+    {
+      "id": "cat1",
+      "name": "Adobe Products",
+      "programs": [
+        {
+          "id": "prog1",
+          "name": "Adobe Photoshop 2025",
+          "shortDescription": "برنامج لتحرير الصور ومعالجتها باحترافية.",
+          "longDescription": "Adobe Photoshop هو المعيار الصناعي في تحرير الرسومات النقطية. يتيح للمستخدمين إنشاء وتعديل الصور والأعمال الفنية الرقمية. يستخدم على نطاق واسع من قبل المصورين والمصممين ومحترفي الويب.",
+          "image": "https://i.imgur.com/YQ5N1r1.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+          "id": "prog2",
+          "name": "Adobe Illustrator 2025",
+          "shortDescription": "برنامج تصميم الرسومات المتجهة (الفيكتور).",
+          "longDescription": "Adobe Illustrator هو محرر رسومات متجهية رائد يتيح لك إنشاء الشعارات والأيقونات والرسومات والطباعة المعقدة. عملك الفني القائم على المتجهات يمكن تغيير حجمه من شاشات الجوال إلى اللوحات الإعلانية مع الحفاظ على جودته.",
+          "image": "https://i.imgur.com/Jz2qA7x.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+          "id": "prog3",
+          "name": "Adobe Premiere Pro 2025",
+          "shortDescription": "برنامج المونتاج وتحرير الفيديو الاحترافي.",
+          "longDescription": "Adobe Premiere Pro هو تطبيق تحرير فيديو احترافي قائم على الجدول الزمني. يستخدم على نطاق واسع لإنشاء محتوى فيديو عالي الجودة للأفلام والتلفزيون والويب.",
+          "image": "https://i.imgur.com/8aV4sTf.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        }
+      ]
+    },
+    {
+      "id": "cat2",
+      "name": "Autodesk Products",
+      "programs": [
+        {
+          "id": "prog4",
+          "name": "AutoCAD 2025",
+          "shortDescription": "برنامج التصميم بمساعدة الحاسوب (CAD).",
+          "longDescription": "AutoCAD هو برنامج تصميم تجاري بمساعدة الكمبيوتر (CAD). تم تطويره وتسويقه بواسطة Autodesk، وهو يسمح للمهندسين والمعماريين ومحترفي البناء بإنشاء رسومات دقيقة ثنائية وثلاثية الأبعاد.",
+          "image": "https://i.imgur.com/dofbXzW.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+          "id": "prog5",
+          "name": "3ds Max 2025",
+          "shortDescription": "برنامج النمذجة والرسوم المتحركة ثلاثية الأبعاد.",
+          "longDescription": "Autodesk 3ds Max هو برنامج رسومات حاسوبية ثلاثية الأبعاد احترافي للنماذج والرسوم المتحركة والعروض المرئية. يستخدم بشكل متكرر من قبل مطوري ألعاب الفيديو واستوديوهات الإعلانات التلفزيونية واستوديوهات التصور المعماري.",
+          "image": "https://i.imgur.com/rNqfT9d.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        }
+      ]
+    },
+    {
+      "id": "cat3",
+      "name": "Browsers and Plugins",
+      "programs": [
+        {
+          "id": "prog6",
+          "name": "Google Chrome",
+          "shortDescription": "متصفح ويب سريع وآمن ومجاني.",
+          "longDescription": "Google Chrome هو متصفح ويب متعدد المنصات تم تطويره بواسطة Google. إنه سريع وبسيط وآمن. يوفر تجربة تصفح رائعة مع ميزات مثل المزامنة عبر الأجهزة ومكتبة واسعة من الإضافات.",
+          "image": "https://i.imgur.com/r7wE1Iu.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+          "id": "prog7",
+          "name": "Mozilla Firefox",
+          "shortDescription": "متصفح ويب مفتوح المصدر يركز على الخصوصية.",
+          "longDescription": "Mozilla Firefox هو متصفح ويب مجاني ومفتوح المصدر تم تطويره بواسطة مؤسسة Mozilla. يركز بشدة على خصوصية المستخدم وأمانه وقابليته للتخصيص.",
+          "image": "https://i.imgur.com/YwP2QYh.png",
+          "downloadUrl": "#",
+          "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        }
+      ]
+    },
+    {
+        "id": "cat4",
+        "name": "Office and News",
+        "programs": [
+          {
+            "id": "prog8",
+            "name": "Microsoft Office 2025",
+            "shortDescription": "مجموعة تطبيقات مكتبية متكاملة.",
+            "longDescription": "Microsoft Office عبارة عن مجموعة من برامج وتطبيقات وخدمات العملاء. تشمل المجموعة تطبيقات شهيرة مثل Word و Excel و PowerPoint و Outlook، وهي ضرورية للمهام الإنتاجية في المنزل والمكتب.",
+            "image": "https://i.imgur.com/6aB4z3n.png",
+            "downloadUrl": "#",
+            "adUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          }
+        ]
+    }
+  ]
+}
