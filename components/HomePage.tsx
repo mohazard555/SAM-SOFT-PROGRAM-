@@ -1,9 +1,8 @@
-
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, Category, Program } from '../types';
-import { SearchIcon, CategoryIcon, InfoIcon, MessageCircleIcon } from './Icons';
+import { SearchIcon, CategoryIcon, InfoIcon, MessageCircleIcon, ChevronDownIcon } from './Icons';
 import InfoModal from './InfoModal';
 
 interface HomePageProps {
@@ -27,26 +26,54 @@ const ProgramItem: React.FC<{ program: Program; slug: string }> = ({ program, sl
     );
 };
 
-const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => string }> = ({ category, slugify }) => (
-    <motion.div
-        layout
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-lg hover:shadow-xl transition-shadow flex flex-col"
-    >
-        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-[#30363d] flex items-center gap-3">
-            <CategoryIcon />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
-        </div>
-        <div className="p-6 space-y-4 flex-grow">
-            {category.programs.map(program => (
-                <ProgramItem key={program.id} program={program} slug={slugify(program.name)} />
-            ))}
-        </div>
-    </motion.div>
-);
+const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => string }> = ({ category, slugify }) => {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-lg hover:shadow-xl transition-shadow flex flex-col overflow-hidden"
+        >
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full text-right p-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-[#30363d] flex items-center justify-between gap-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                aria-expanded={isOpen}
+            >
+                <div className="flex items-center gap-3">
+                    <CategoryIcon />
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
+                </div>
+                <ChevronDownIcon className={`transform transition-transform duration-300 text-gray-500 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    key="content"
+                    initial="collapsed"
+                    animate="open"
+                    exit="collapsed"
+                    variants={{
+                        open: { opacity: 1, height: 'auto' },
+                        collapsed: { opacity: 0, height: 0 }
+                    }}
+                    transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                    className="overflow-hidden"
+                >
+                    <div className="p-6 space-y-4 flex-grow">
+                        {category.programs.map(program => (
+                            <ProgramItem key={program.id} program={program} slug={slugify(program.name)} />
+                        ))}
+                    </div>
+                </motion.div>
+            )}
+            </AnimatePresence>
+        </motion.div>
+    );
+};
 
 const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
   const [searchQuery, setSearchQuery] = useState('');
