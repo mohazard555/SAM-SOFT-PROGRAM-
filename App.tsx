@@ -37,7 +37,7 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0d1117] text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-white">
         <div className="text-2xl">جاري تحميل الإعدادات...</div>
       </div>
     );
@@ -45,7 +45,7 @@ const App: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0d1117] text-red-500">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#0d1117] text-red-500">
         <div className="text-2xl">خطأ في تحميل ملف الإعدادات: {error}</div>
       </div>
     );

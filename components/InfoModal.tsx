@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloseIcon } from './Icons';
@@ -27,17 +28,17 @@ const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, title, content }
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl w-full max-w-2xl relative"
+            className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-2xl w-full max-w-2xl relative"
             onClick={(e) => e.stopPropagation()}
             aria-labelledby="info-modal-title"
           >
-            <div className="flex justify-between items-center p-4 border-b border-[#30363d]">
-                <h2 id="info-modal-title" className="text-xl font-bold text-white">{title}</h2>
-                <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded-full" aria-label="إغلاق">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-[#30363d]">
+                <h2 id="info-modal-title" className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
+                <button onClick={onClose} className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full" aria-label="إغلاق">
                     <CloseIcon />
                 </button>
             </div>
-            <div className="p-6 text-gray-300 leading-relaxed whitespace-pre-wrap max-h-[60vh] overflow-y-auto scrollbar-thin">
+            <div className="p-6 text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap max-h-[60vh] overflow-y-auto scrollbar-thin">
               {content}
             </div>
           </motion.div>

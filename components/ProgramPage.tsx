@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -92,7 +93,7 @@ const AdGateModal: React.FC<{
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
                         transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-                        className="bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl w-full max-w-lg relative"
+                        className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-2xl w-full max-w-lg relative"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {canClose && (
@@ -101,15 +102,15 @@ const AdGateModal: React.FC<{
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.5 }}
                                 onClick={onClose} 
-                                className="absolute top-2 left-2 p-2 text-gray-400 hover:text-white rounded-full z-10"
+                                className="absolute top-2 left-2 p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full z-10"
                                 aria-label="إغلاق"
                             >
                                 <CloseIcon />
                             </motion.button>
                         )}
                         <div className="p-8">
-                            <h2 className="text-2xl font-bold text-center text-white mb-4">يتم تجهيز الرابط الخاص بك</h2>
-                            <div className="bg-black rounded-lg aspect-video flex flex-col items-center justify-center mb-4 border border-gray-700 overflow-hidden">
+                            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-4">يتم تجهيز الرابط الخاص بك</h2>
+                            <div className="bg-black rounded-lg aspect-video flex flex-col items-center justify-center mb-4 border border-gray-200 dark:border-gray-700 overflow-hidden">
                                 {embedUrl ? (
                                     <iframe
                                         className="w-full h-full"
@@ -129,15 +130,15 @@ const AdGateModal: React.FC<{
                             
                             <div className="h-16 flex items-center justify-center">
                                 {step === 'counting' && (
-                                    <p className="text-center text-yellow-400 text-lg">
+                                    <p className="text-center text-yellow-500 dark:text-yellow-400 text-lg">
                                         نرجو الانتظار <span className="font-bold text-xl tabular-nums">{countdown}</span> ثانية لتوجيهكم لرابط التحميل...
                                     </p>
                                 )}
                                 {step === 'postAd' && (
-                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-blue-400 font-semibold text-lg">الخطوة التالية: يرجى زيارة رابط الإعلان.</motion.p>
+                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-blue-600 dark:text-blue-400 font-semibold text-lg">الخطوة التالية: يرجى زيارة رابط الإعلان.</motion.p>
                                 )}
                                 {step === 'download' && (
-                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-green-400 font-semibold text-lg">الرابط جاهز للتحميل!</motion.p>
+                                    <motion.p initial={{opacity:0}} animate={{opacity:1}} className="text-center text-green-600 dark:text-green-400 font-semibold text-lg">الرابط جاهز للتحميل!</motion.p>
                                 )}
                             </div>
                             
@@ -145,7 +146,7 @@ const AdGateModal: React.FC<{
                                 {step === 'counting' && (
                                     <button
                                         disabled
-                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all bg-gray-600 text-gray-400 cursor-not-allowed"
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                                     >
                                         <DownloadIcon />
                                         <span>الرجاء الانتظار...</span>
@@ -154,7 +155,7 @@ const AdGateModal: React.FC<{
                                 {step === 'postAd' && (
                                     <button
                                         onClick={handlePostAdClick}
-                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-lg"
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900 focus:ring-blue-500 bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-lg"
                                     >
                                         <ExternalLinkIcon />
                                         <span>الانتقال إلى رابط الإعلان</span>
@@ -165,7 +166,7 @@ const AdGateModal: React.FC<{
                                         href={downloadUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-green-500 bg-green-600 text-white hover:bg-green-700 hover:scale-105 shadow-lg"
+                                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 font-bold rounded-lg transition-all transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900 focus:ring-green-500 bg-green-600 text-white hover:bg-green-700 hover:scale-105 shadow-lg"
                                         onClick={handleDownloadClick}
                                     >
                                         <DownloadIcon />
@@ -194,7 +195,7 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
     return (
       <div className="text-center py-20">
         <h2 className="text-3xl font-bold text-red-500 mb-4">البرنامج غير موجود</h2>
-        <Link to="/" className="text-blue-400 hover:underline">العودة إلى الصفحة الرئيسية</Link>
+        <Link to="/" className="text-blue-500 dark:text-blue-400 hover:underline">العودة إلى الصفحة الرئيسية</Link>
       </div>
     );
   }
@@ -205,11 +206,11 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl overflow-hidden"
+        className="max-w-4xl mx-auto bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-2xl overflow-hidden"
       >
         <div className="p-6 sm:p-8">
           <div className="mb-6">
-            <Link to="/" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors">
+            <Link to="/" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
               <BackIcon />
               <span>العودة إلى القائمة</span>
             </Link>
@@ -220,22 +221,22 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
               <img 
                 src={program.image} 
                 alt={program.name} 
-                className="w-40 h-40 object-contain rounded-lg mb-4 bg-white/10 p-2"
+                className="w-40 h-40 object-contain rounded-lg mb-4 bg-gray-100 dark:bg-white/10 p-2"
               />
             </div>
             <div className="md:col-span-2">
-              <span className="text-sm text-blue-400 bg-blue-900/50 px-3 py-1 rounded-full">{program.categoryName}</span>
-              <h1 className="text-4xl font-bold text-white my-3">{program.name}</h1>
-              <p className="text-gray-300 leading-relaxed text-lg">
+              <span className="text-sm text-blue-800 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-3 py-1 rounded-full">{program.categoryName}</span>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white my-3">{program.name}</h1>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
                 {program.longDescription}
               </p>
             </div>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-[#30363d] flex justify-center">
+          <div className="mt-10 pt-6 border-t border-gray-200 dark:border-[#30363d] flex justify-center">
             <button
               onClick={() => setIsAdModalOpen(true)}
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 focus:ring-blue-500"
             >
               <DownloadIcon />
               <span>تحميل مباشر</span>

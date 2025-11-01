@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -22,21 +23,34 @@
       }
     </script>
     <style>
-      body {
-        background-color: #0d1117;
-      }
       .scrollbar-thin::-webkit-scrollbar {
         width: 8px;
       }
       .scrollbar-thin::-webkit-scrollbar-track {
+        background: #e5e7eb;
+      }
+      .dark .scrollbar-thin::-webkit-scrollbar-track {
         background: #161b22;
       }
       .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: #9ca3af;
+        border-radius: 10px;
+        border: 3px solid #e5e7eb;
+      }
+      .dark .scrollbar-thin::-webkit-scrollbar-thumb {
         background-color: #30363d;
         border-radius: 10px;
         border: 3px solid #161b22;
       }
     </style>
+    <script>
+      // Prevents FOUC (Flash of Unstyled Content)
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   <script type="importmap">
 {
   "imports": {

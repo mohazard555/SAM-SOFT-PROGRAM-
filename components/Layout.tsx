@@ -3,39 +3,56 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, Ad } from '../types';
-import { AdminIcon, CloseIcon } from './Icons';
+import { AdminIcon, CloseIcon, SunIcon, MoonIcon } from './Icons';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface LayoutProps {
   config: Config;
   onAdminClick: () => void;
 }
 
+const ThemeToggleButton: React.FC = () => {
+    const { theme, toggleTheme } = useTheme();
+    return (
+        <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle theme"
+        >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </button>
+    );
+};
+
 const Header: React.FC<LayoutProps> = ({ config, onAdminClick }) => (
-  <header className="bg-[#161b22]/80 backdrop-blur-sm border-b border-[#30363d] sticky top-0 z-40">
+  <header className="bg-white/80 dark:bg-[#161b22]/80 backdrop-blur-sm border-b border-gray-200 dark:border-[#30363d] sticky top-0 z-40">
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between h-20">
         <Link to="/" className="flex items-center gap-4">
           {config.siteLogo && <img src={config.siteLogo} alt="Logo" className="h-10 w-10 object-contain"/>}
-          <h1 className="text-xl md:text-2xl font-bold text-white tracking-wider">{config.siteName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-wider">{config.siteName}</h1>
         </Link>
-        <button
-          onClick={onAdminClick}
-          className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
-          aria-label="Admin Panel"
-        >
-          <AdminIcon />
-        </button>
+        <div className="flex items-center gap-2">
+            <ThemeToggleButton />
+            <button
+              onClick={onAdminClick}
+              className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Admin Panel"
+            >
+              <AdminIcon />
+            </button>
+        </div>
       </div>
     </div>
   </header>
 );
 
 const Footer: React.FC<{ developer: string; siteName: string }> = ({ developer, siteName }) => (
-  <footer className="bg-[#161b22] border-t border-[#30363d] mt-12">
-    <div className="container mx-auto py-6 px-4 text-center text-gray-400">
+  <footer className="bg-gray-100 dark:bg-[#161b22] border-t border-gray-200 dark:border-[#30363d] mt-12">
+    <div className="container mx-auto py-6 px-4 text-center text-gray-500 dark:text-gray-400">
       <p>&copy; جميع الحقوق محفوظة لـ {siteName}</p>
       <p className="text-sm mt-1">
-        تم التطوير بواسطة: <span className="font-semibold text-gray-300">{developer}</span>
+        تم التطوير بواسطة: <span className="font-semibold text-gray-600 dark:text-gray-300">{developer}</span>
       </p>
     </div>
   </footer>
@@ -84,16 +101,16 @@ const AdBanner: React.FC<AdBannerProps> = ({ ads }) => {
             href={ad.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl p-4 max-w-sm w-full text-white no-underline hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-4 bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-xl shadow-2xl p-4 max-w-sm w-full text-gray-900 dark:text-white no-underline hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <img src={ad.image} alt={ad.name} className="w-16 h-16 object-cover rounded-md flex-shrink-0" />
             <div className="flex-grow">
               <h4 className="font-bold text-base">{ad.name}</h4>
-              <p className="text-sm text-gray-400">{ad.description}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{ad.description}</p>
             </div>
             <button
               onClick={handleDismiss}
-              className="p-1 text-gray-500 hover:text-white rounded-full self-start flex-shrink-0 -mr-2"
+              className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white rounded-full self-start flex-shrink-0 -mr-2"
               aria-label="إخفاء الإعلان"
             >
               <CloseIcon />
@@ -108,7 +125,7 @@ const AdBanner: React.FC<AdBannerProps> = ({ ads }) => {
 
 const Layout: React.FC<LayoutProps> = ({ config, onAdminClick }) => {
   return (
-    <div className="min-h-screen bg-[#0d1117] text-gray-200 font-sans flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0d1117] text-gray-800 dark:text-gray-200 font-sans flex flex-col">
       <Header config={config} onAdminClick={onAdminClick} />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />

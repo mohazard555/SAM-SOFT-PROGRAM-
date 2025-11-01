@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,15 +13,15 @@ interface HomePageProps {
 
 const ProgramItem: React.FC<{ program: Program; slug: string }> = ({ program, slug }) => {
     return (
-        <Link to={`/program/${slug}`} className="block text-gray-300 hover:text-white transition-colors group">
+        <Link to={`/program/${slug}`} className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group">
             <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium text-blue-400 group-hover:underline">{program.name}</span>
+                <span className="font-medium text-blue-600 dark:text-blue-400 group-hover:underline">{program.name}</span>
                 {program.badge && (
                     <span className="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded-full">
                         {program.badge}
                     </span>
                 )}
-                <span className="text-sm text-gray-500">- {program.shortDescription}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-500">- {program.shortDescription}</span>
             </div>
         </Link>
     );
@@ -33,11 +34,11 @@ const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => st
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3 }}
-        className="bg-[#161b22] border border-[#30363d] rounded-2xl shadow-lg overflow-hidden flex flex-col"
+        className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-lg hover:shadow-xl transition-shadow flex flex-col"
     >
-        <div className="p-4 bg-gray-800/50 border-b border-[#30363d] flex items-center gap-3">
+        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-[#30363d] flex items-center gap-3">
             <CategoryIcon />
-            <h2 className="text-xl font-bold text-white">{category.name}</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
         </div>
         <div className="p-6 space-y-4 flex-grow">
             {category.programs.map(program => (
@@ -85,17 +86,17 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
           placeholder="ابحث عن برنامج أو فئة..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-4 pr-12 bg-[#161b22] border border-[#30363d] rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+          className="w-full p-4 pr-12 bg-white dark:bg-[#161b22] border border-gray-300 dark:border-[#30363d] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
           <SearchIcon />
         </div>
       </div>
       
-      <div className="flex justify-center items-center gap-6 text-gray-400">
+      <div className="flex justify-center items-center gap-6 text-gray-500 dark:text-gray-400">
         <button 
             onClick={() => setModalData({ title: 'حول الموقع', content: config.siteAbout || 'لا يوجد وصف متاح حالياً.' })}
-            className="flex items-center gap-2 hover:text-blue-400 transition-colors"
+            className="flex items-center gap-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             aria-label="عرض معلومات حول الموقع"
         >
             <InfoIcon />
@@ -103,7 +104,7 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
         </button>
         <button 
             onClick={() => setModalData({ title: 'أعلن معنا', content: config.advertiseInfo || 'معلومات الإعلان غير متاحة حالياً.' })}
-            className="flex items-center gap-2 hover:text-blue-400 transition-colors"
+            className="flex items-center gap-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             aria-label="عرض معلومات الإعلان"
         >
             <MessageCircleIcon />
@@ -117,7 +118,7 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
         ))}
       </motion.div>
       {filteredCategories.length === 0 && (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-gray-500 dark:text-gray-500">
             <p className="text-2xl">لا توجد نتائج</p>
             <p>حاول البحث بكلمات أخرى.</p>
         </div>

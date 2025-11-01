@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program, Ad } from '../types';
@@ -14,14 +15,14 @@ interface AdminModalProps {
 const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
     <input
         {...props}
-        className="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-md text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        className="w-full p-2 bg-gray-50 dark:bg-[#0d1117] border border-gray-300 dark:border-[#30363d] rounded-md text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
     />
 );
 
 const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = (props) => (
     <textarea
         {...props}
-        className="w-full p-2 bg-[#0d1117] border border-[#30363d] rounded-md text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        className="w-full p-2 bg-gray-50 dark:bg-[#0d1117] border border-gray-300 dark:border-[#30363d] rounded-md text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
         rows={3}
     />
 );
@@ -169,7 +170,7 @@ const AdminPanel: React.FC<{
 
 
     return (
-        <div className="text-white p-2 sm:p-6 space-y-6">
+        <div className="text-gray-900 dark:text-white p-2 sm:p-6 space-y-6">
             <input
                 type="file"
                 ref={importInputRef}
@@ -192,18 +193,18 @@ const AdminPanel: React.FC<{
                 </div>
             </div>
             
-            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold mb-3">معلومات الموقع</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm text-gray-400">اسم الموقع</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">اسم الموقع</label>
                         <Input name="siteName" value={currentConfig.siteName} onChange={handleSiteInfoChange} />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-400">شعار الموقع</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">شعار الموقع</label>
                         <div className="flex items-center gap-4 mt-1">
-                            <img src={currentConfig.siteLogo} alt="Site Logo" className="w-12 h-12 object-contain rounded-md bg-gray-700 p-1" />
-                            <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                            <img src={currentConfig.siteLogo} alt="Site Logo" className="w-12 h-12 object-contain rounded-md bg-gray-200 dark:bg-gray-700 p-1" />
+                            <label className="cursor-pointer bg-gray-600 hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
                                 <UploadIcon />
                                 <span>تغيير الشعار</span>
                                 <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -216,29 +217,29 @@ const AdminPanel: React.FC<{
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-400">اسم المطور</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">اسم المطور</label>
                         <Input name="developer" value={currentConfig.developer} onChange={handleSiteInfoChange} />
                     </div>
                      <div>
-                        <label className="block text-sm text-gray-400">حول الموقع</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">حول الموقع</label>
                         <Textarea name="siteAbout" value={currentConfig.siteAbout || ''} onChange={handleSiteInfoChange} rows={4} />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-400">معلومات (أعلن معنا)</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">معلومات (أعلن معنا)</label>
                         <Textarea name="advertiseInfo" value={currentConfig.advertiseInfo || ''} onChange={handleSiteInfoChange} rows={4} />
                     </div>
                 </div>
             </div>
 
-            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><UserCogIcon/> <span>إعدادات المدير</span></h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm text-gray-400">اسم المستخدم</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">اسم المستخدم</label>
                         <Input name="username" value={currentConfig.admin.username} onChange={handleAdminChange} />
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-400">كلمة المرور</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400">كلمة المرور</label>
                         <Input name="password" type="password" value={currentConfig.admin.password || ''} onChange={handleAdminChange} />
                          <p className="text-xs text-gray-500 mt-1">
                             تنبيه: عند تغيير اسم المستخدم أو كلمة المرور، ستحتاج إلى استخدام البيانات الجديدة لتسجيل الدخول في المرة القادمة.
@@ -247,29 +248,29 @@ const AdminPanel: React.FC<{
                 </div>
             </div>
 
-            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><MegaphoneIcon /> <span>الإعلانات الخاصة</span></h3>
                 <div className="space-y-4">
                     {(currentConfig.ads || []).map((ad, adIndex) => (
-                        <div key={ad.id} className="bg-gray-900/50 p-3 rounded-md space-y-2 relative">
+                        <div key={ad.id} className="bg-white dark:bg-gray-900/50 p-3 rounded-md space-y-2 relative border border-gray-200 dark:border-gray-700">
                             <button onClick={() => deleteAd(adIndex)} className="absolute top-2 left-2 text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
                             <div>
-                                <label className="block text-sm text-gray-400">اسم الإعلان</label>
+                                <label className="block text-sm text-gray-600 dark:text-gray-400">اسم الإعلان</label>
                                 <Input name="name" value={ad.name} onChange={(e) => handleAdChange(adIndex, e)} />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-400">وصف الإعلان</label>
+                                <label className="block text-sm text-gray-600 dark:text-gray-400">وصف الإعلان</label>
                                 <Textarea name="description" value={ad.description} onChange={(e) => handleAdChange(adIndex, e)} rows={2} />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-400">رابط الإعلان</label>
+                                <label className="block text-sm text-gray-600 dark:text-gray-400">رابط الإعلان</label>
                                 <Input name="link" value={ad.link} onChange={(e) => handleAdChange(adIndex, e)} />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-400 mb-1">صورة الإعلان</label>
+                                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">صورة الإعلان</label>
                                 <div className="flex items-center gap-2">
-                                    <img src={ad.image} alt={ad.name} className="w-16 h-10 object-cover rounded bg-gray-700 p-1" />
-                                    <label className="cursor-pointer text-xs bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded-md transition-colors inline-flex items-center gap-1">
+                                    <img src={ad.image} alt={ad.name} className="w-16 h-10 object-cover rounded bg-gray-200 dark:bg-gray-700 p-1" />
+                                    <label className="cursor-pointer text-xs bg-gray-600 hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 text-white py-1 px-2 rounded-md transition-colors inline-flex items-center gap-1">
                                         <UploadIcon />
                                         <span>تغيير</span>
                                         <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -293,7 +294,7 @@ const AdminPanel: React.FC<{
             </div>
 
             <div className="space-y-4">
-                 <div className="flex justify-between items-center pt-4 border-t border-gray-700">
+                 <div className="flex justify-between items-center pt-4 border-t border-gray-300 dark:border-gray-700">
                     <h3 className="text-xl font-bold">الفئات والبرامج</h3>
                     <button onClick={addCategory} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-md transition-colors inline-flex items-center gap-2">
                         <PlusIcon />
@@ -301,14 +302,14 @@ const AdminPanel: React.FC<{
                     </button>
                  </div>
                 {currentConfig.categories.map((cat, catIndex) => (
-                    <div key={cat.id} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <div key={cat.id} className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                         <div className="flex justify-between items-center mb-3">
-                            <input name="name" value={cat.name} onChange={(e) => handleCategoryChange(catIndex, e)} className="text-lg font-semibold bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none"/>
+                            <input name="name" value={cat.name} onChange={(e) => handleCategoryChange(catIndex, e)} className="text-lg font-semibold bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-blue-500 outline-none w-full"/>
                             <button onClick={() => deleteCategory(catIndex)} className="text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
                         </div>
-                        <div className="space-y-3 pl-4 border-r-2 border-gray-600">
+                        <div className="space-y-3 pl-4 border-r-2 border-gray-300 dark:border-gray-600">
                             {cat.programs.map((prog, progIndex) => (
-                                <div key={prog.id} className="bg-gray-900/50 p-3 rounded-md">
+                                <div key={prog.id} className="bg-white dark:bg-gray-900/50 p-3 rounded-md border border-gray-200 dark:border-gray-700">
                                     <div className="flex justify-between items-center mb-2">
                                         <input name="name" value={prog.name} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} className="font-semibold bg-transparent w-full"/>
                                         <button onClick={() => deleteProgram(catIndex, progIndex)} className="text-red-500 hover:text-red-400 p-1 rounded-full"><TrashIcon /></button>
@@ -320,10 +321,10 @@ const AdminPanel: React.FC<{
                                         <Input name="adUrl" placeholder="رابط فيديو الإعلان (YouTube)" value={prog.adUrl} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <Input name="postAdUrl" placeholder="رابط بعد الإعلان (اختياري)" value={prog.postAdUrl || ''} onChange={(e) => handleProgramChange(catIndex, progIndex, e)} />
                                         <div>
-                                            <label className="block text-sm text-gray-400 mb-1">صورة البرنامج</label>
+                                            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">صورة البرنامج</label>
                                             <div className="flex items-center gap-2">
-                                                <img src={prog.image} alt={prog.name} className="w-10 h-10 object-contain rounded bg-gray-700 p-1" />
-                                                <label className="cursor-pointer text-xs bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded-md transition-colors inline-flex items-center gap-1">
+                                                <img src={prog.image} alt={prog.name} className="w-10 h-10 object-contain rounded bg-gray-200 dark:bg-gray-700 p-1" />
+                                                <label className="cursor-pointer text-xs bg-gray-600 hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 text-white py-1 px-2 rounded-md transition-colors inline-flex items-center gap-1">
                                                     <UploadIcon />
                                                     <span>تغيير</span>
                                                     <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -365,7 +366,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
 
     return (
         <div className="p-8">
-            <h2 className="text-2xl font-bold text-center text-white mb-6">تسجيل دخول المدير</h2>
+            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">تسجيل دخول المدير</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                     type="text"
@@ -436,11 +437,11 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, config, setCon
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col"
+            className="bg-white dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-end p-2 border-b border-[#30363d]">
-              <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded-full">
+            <div className="flex justify-end p-2 border-b border-gray-200 dark:border-[#30363d]">
+              <button onClick={onClose} className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full">
                 <CloseIcon />
               </button>
             </div>
