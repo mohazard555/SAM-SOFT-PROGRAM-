@@ -2,14 +2,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program, Ad } from '../types';
-import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon, DownloadIcon, UserCogIcon, MegaphoneIcon } from './Icons';
+import { CloseIcon, SaveIcon, PlusIcon, TrashIcon, UploadIcon, DownloadIcon, UserCogIcon, MegaphoneIcon, SyncIcon } from './Icons';
 
 interface AdminModalProps {
   isOpen: boolean;
   onClose: () => void;
   config: Config;
   setConfig: React.Dispatch<React.SetStateAction<Config>>;
-  saveConfig: () => void;
+  saveConfig: () => Promise<void>;
+  exportConfig: () => void;
 }
 
 const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
@@ -39,10 +40,30 @@ const fileToBase64 = (file: File): Promise<string> => {
 const AdminPanel: React.FC<{
     currentConfig: Config;
     setConfig: React.Dispatch<React.SetStateAction<Config>>;
-    saveConfig: () => void;
+    saveConfig: () => Promise<void>;
+    exportConfig: () => void;
     logout: () => void;
-}> = ({ currentConfig, setConfig, saveConfig, logout }) => {
+}> = ({ currentConfig, setConfig, saveConfig, exportConfig, logout }) => {
     const importInputRef = useRef<HTMLInputElement>(null);
+    const [gistUrl, setGistUrl] = useState('');
+    const [githubToken, setGithubToken] = useState('');
+
+    useEffect(() => {
+        setGistUrl(localStorage.getItem('gistRawUrl') || '');
+        setGithubToken(localStorage.getItem('githubToken') || '');
+    }, []);
+
+    const handleGistUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setGistUrl(value);
+        localStorage.setItem('gistRawUrl', value);
+    };
+
+    const handleGithubTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setGithubToken(value);
+        localStorage.setItem('githubToken', value);
+    };
 
     const handleSiteInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setConfig(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -181,18 +202,41 @@ const AdminPanel: React.FC<{
             <div className="flex justify-between items-center flex-wrap gap-2">
                 <h2 className="text-2xl font-bold">لوحة التحكم</h2>
                 <div className="flex items-center gap-2 flex-wrap">
-                     <button onClick={handleImportClick} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
-                        <UploadIcon />
-                        <span>استيراد الإعدادات</span>
+                    <button onClick={saveConfig} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                        <SaveIcon />
+                        <span>حفظ ومزامنة</span>
                     </button>
-                    <button onClick={saveConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                    <button onClick={handleImportClick} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
+                        <UploadIcon />
+                        <span>استيراد</span>
+                    </button>
+                    <button onClick={exportConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors inline-flex items-center gap-2">
                         <DownloadIcon />
-                        <span>تصدير الإعدادات</span>
+                        <span>تصدير</span>
                     </button>
                     <button onClick={logout} className="ml-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition-colors">تسجيل الخروج</button>
                 </div>
             </div>
             
+            <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><SyncIcon /> <span>المزامنة عبر الإنترنت</span></h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 mb-4 p-3 bg-gray-200 dark:bg-gray-900/50 rounded-md">
+                    <p>1. الصق <b>Gist Raw URL</b> في الحقل الأول ليكون مصدر بيانات الموقع.</p>
+                    <p>2. أنشئ <b>Personal Access Token (Classic)</b> من إعدادات GitHub مع صلاحية `gist` فقط.</p>
+                    <p>3. الصق الـ <b>Token</b> في الحقل الثاني لتمكين الحفظ والمزامنة.</p>
+                </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">رابط Gist Raw للمزامنة</label>
+                        <Input name="gistUrl" value={gistUrl} onChange={handleGistUrlChange} placeholder="https://gist.githubusercontent.com/..."/>
+                    </div>
+                    <div>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">GitHub Personal Access Token</label>
+                        <Input name="githubToken" type="password" value={githubToken} onChange={handleGithubTokenChange} placeholder="أدخل التوكن الخاص بك هنا"/>
+                    </div>
+                </div>
+            </div>
+
             <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold mb-3">معلومات الموقع</h3>
                 <div className="space-y-4">
@@ -395,7 +439,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
 };
 
 
-const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, config, setConfig, saveConfig }) => {
+const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, config, setConfig, saveConfig, exportConfig }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   
@@ -447,7 +491,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose, config, setCon
             </div>
              <div className="flex-grow overflow-y-auto scrollbar-thin">
                 {isAuthenticated ? (
-                    <AdminPanel currentConfig={config} setConfig={setConfig} saveConfig={saveConfig} logout={handleLogout} />
+                    <AdminPanel currentConfig={config} setConfig={setConfig} saveConfig={saveConfig} exportConfig={exportConfig} logout={handleLogout} />
                 ) : (
                     <AdminLogin onLogin={handleLogin} error={loginError} />
                 )}

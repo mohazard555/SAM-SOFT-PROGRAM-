@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Layout from './components/Layout';
 import HomePage from './components/HomePage';
 import ProgramPage from './components/ProgramPage';
 import { useConfig } from './hooks/useConfig';
 import AdminModal from './components/AdminModal';
+import Toast from './components/Toast';
 import { Config, Program } from './types';
 
 const slugify = (text: string) =>
@@ -18,9 +20,12 @@ const slugify = (text: string) =>
     .replace(/^-+/, '')
     .replace(/-+$/, '');
 
+type ToastState = { message: string; type: 'loading' | 'success' | 'error' };
+
 const App: React.FC = () => {
-  const { config, loading, error, setConfig, saveConfig } = useConfig();
+  const { config, loading, error, setConfig, exportConfig, saveConfig } = useConfig();
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   const allPrograms: (Program & { categoryName: string })[] = config
     ? config.categories.flatMap(category =>
@@ -54,6 +59,21 @@ const App: React.FC = () => {
   if (!config) {
     return null;
   }
+  
+  const handleSaveConfig = async () => {
+    setToast({ message: 'جاري المزامنة...', type: 'loading' });
+    try {
+        await saveConfig();
+        setToast({ message: 'تمت المزامنة بنجاح!', type: 'success' });
+    } catch (err) {
+        if (err instanceof Error) {
+            setToast({ message: `فشل المزامنة: ${err.message}`, type: 'error' });
+        } else {
+            setToast({ message: 'فشل المزامنة: خطأ غير معروف.', type: 'error' });
+        }
+    }
+  };
+
 
   return (
     <>
@@ -68,8 +88,18 @@ const App: React.FC = () => {
         onClose={() => setIsAdminModalOpen(false)}
         config={config}
         setConfig={setConfig as React.Dispatch<React.SetStateAction<Config>>}
-        saveConfig={saveConfig}
+        saveConfig={handleSaveConfig}
+        exportConfig={exportConfig}
       />
+      <AnimatePresence>
+        {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
+      </AnimatePresence>
     </>
   );
 };

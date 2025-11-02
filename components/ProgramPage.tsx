@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Program } from '../types';
-import { DownloadIcon, BackIcon, VideoIcon, CloseIcon, ExternalLinkIcon } from './Icons';
+import { DownloadIcon, BackIcon, VideoIcon, CloseIcon, ExternalLinkIcon, EyeIcon } from './Icons';
+import { useDownloads } from '../hooks/useDownloads';
 
 const getYouTubeEmbedUrl = (url: string) => {
     if (!url) return null;
@@ -131,7 +132,7 @@ const AdGateModal: React.FC<{
                             <div className="h-16 flex items-center justify-center">
                                 {step === 'counting' && (
                                     <p className="text-center text-yellow-500 dark:text-yellow-400 text-lg">
-                                        نرجو الانتظار <span className="font-bold text-xl tabular-nums">{countdown}</span> ثانية لتوجيهكم لرابط التحميل...
+                                        نرجو الانتظार <span className="font-bold text-xl tabular-nums">{countdown}</span> ثانية لتوجيهكم لرابط التحميل...
                                     </p>
                                 )}
                                 {step === 'postAd' && (
@@ -190,6 +191,14 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
   const { slug } = useParams<{ slug: string }>();
   const program = slug ? findProgramBySlug(slug) : undefined;
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+  const { getDownloadCount, incrementDownloadCount } = useDownloads();
+  const [downloads, setDownloads] = useState(0);
+
+  useEffect(() => {
+    if (program) {
+        setDownloads(getDownloadCount(program.id));
+    }
+  }, [program, getDownloadCount]);
 
   if (!program) {
     return (
@@ -199,6 +208,12 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
       </div>
     );
   }
+  
+  const handleDownloadButtonClick = () => {
+    incrementDownloadCount(program.id);
+    setDownloads(prev => prev + 1);
+    setIsAdModalOpen(true);
+  };
 
   return (
     <>
@@ -227,6 +242,10 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
             <div className="md:col-span-2">
               <span className="text-sm text-blue-800 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-3 py-1 rounded-full">{program.categoryName}</span>
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white my-3">{program.name}</h1>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <EyeIcon />
+                <span>{downloads.toLocaleString('ar-EG')} تحميل</span>
+              </div>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
                 {program.longDescription}
               </p>
@@ -235,7 +254,7 @@ const ProgramPage: React.FC<ProgramPageProps> = ({ findProgramBySlug }) => {
 
           <div className="mt-10 pt-6 border-t border-gray-200 dark:border-[#30363d] flex justify-center">
             <button
-              onClick={() => setIsAdModalOpen(true)}
+              onClick={handleDownloadButtonClick}
               className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 focus:ring-blue-500"
             >
               <DownloadIcon />
