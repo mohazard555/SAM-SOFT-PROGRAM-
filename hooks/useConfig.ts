@@ -29,8 +29,9 @@ export const useConfig = () => {
       let bootstrapConfig: any = null;
 
       try {
-        // First, try to fetch the local bootstrap config. This file tells us if there's a live Gist URL.
+        // First, try to fetch the local bootstrap config. Use an absolute path to be robust against routing changes.
         const bootstrapResponse = await fetch('/config.json');
+
         if (!bootstrapResponse.ok) {
             // If the local file itself is not found, this is a critical error unless we have a cache.
             throw new Error(`Could not load configuration file: ${bootstrapResponse.status}`);
@@ -43,15 +44,28 @@ export const useConfig = () => {
         
         // If a valid Gist URL is provided, fetch the live config from there.
         if (gistRawUrl && typeof gistRawUrl === 'string' && gistRawUrl.trim() !== '') {
-            const url = new URL(gistRawUrl); // Gist URLs are absolute
-            url.searchParams.set('_', new Date().getTime().toString()); // Cache bust
-            const mainResponse = await fetch(url.toString());
-            if (!mainResponse.ok) {
-              // If Gist fetch fails, we'll fall back to the bootstrapConfig.
-              console.warn(`Failed to fetch from Gist ${gistRawUrl}: ${mainResponse.status}. Falling back to local config.`);
-              liveConfig = bootstrapConfig;
-            } else {
-              liveConfig = await mainResponse.json();
+            try {
+                // Gist URLs are absolute. Add cache-busting param.
+                const url = new URL(gistRawUrl);
+                url.searchParams.set('_', new Date().getTime().toString());
+                
+                const mainResponse = await fetch(url.toString());
+                if (!mainResponse.ok) {
+                    throw new Error(`Gist fetch failed with status ${mainResponse.status}`);
+                }
+                
+                const gistData = await mainResponse.json();
+                
+                // Stricter validation to ensure the fetched data is a valid config object, not an empty array or other junk.
+                if (typeof gistData === 'object' && gistData !== null && !Array.isArray(gistData) && gistData.siteName && gistData.admin && Array.isArray(gistData.categories)) {
+                    liveConfig = gistData;
+                } else {
+                    throw new Error('Invalid or empty config received from Gist.');
+                }
+            } catch (gistError) {
+                const message = gistError instanceof Error ? gistError.message : String(gistError);
+                console.warn(`Could not load or parse config from Gist (${gistRawUrl}): ${message}. Falling back to local config.`);
+                liveConfig = bootstrapConfig;
             }
         } else {
             // If no Gist URL, the bootstrap config is our main config.
