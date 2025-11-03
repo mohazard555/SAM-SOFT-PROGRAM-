@@ -58,9 +58,13 @@ export const useConfig = () => {
         const gistRawUrl = bootstrapConfig.gistRawUrl;
 
         if (gistRawUrl && typeof gistRawUrl === 'string' && gistRawUrl.trim() !== '') {
+          // IMPORTANT: Strip the commit hash from the Gist URL to always fetch the latest version.
+          // This prevents the app from being stuck on an old version of the config.
+          const urlWithCommitRemoved = gistRawUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+
           // Attempt to fetch the live config from Gist
           try {
-            const url = new URL(gistRawUrl);
+            const url = new URL(urlWithCommitRemoved);
             url.searchParams.set('_', new Date().getTime().toString());
             const mainResponse = await fetch(url.toString());
             if (!mainResponse.ok) throw new Error(`Gist fetch failed with status ${mainResponse.status}`);
@@ -120,17 +124,20 @@ export const useConfig = () => {
   const saveConfig = useCallback(async (configToSave: Config) => {
     if (!configToSave) return;
 
-    const gistRawUrl = localStorage.getItem('gistRawUrl');
+    const gistRawUrlFromStorage = localStorage.getItem('gistRawUrl');
     const githubToken = localStorage.getItem('githubToken');
 
-    if (!gistRawUrl || !githubToken) {
+    if (!gistRawUrlFromStorage || !githubToken) {
         throw new Error("لم يتم تكوين المزامنة. يرجى إدخال رابط Gist Raw و GitHub Token في إعدادات المزامنة.");
     }
 
-    const match = gistRawUrl.match(/https:\/\/gist\.githubusercontent\.com\/[^\/]+\/([a-fA-F0-9]+)\/raw\/(?:[a-fA-F0-9]+\/)?(.*)$/);
+    // IMPORTANT: Strip the commit hash from the Gist URL to ensure the API call targets the correct Gist.
+    const gistRawUrl = gistRawUrlFromStorage.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+
+    const match = gistRawUrl.match(/https:\/\/gist\.githubusercontent\.com\/[^\/]+\/([a-fA-F0-9]+)\/raw\/(.*)$/);
 
     if (!match) {
-        throw new Error("رابط Gist Raw غير صالح. يجب أن يكون بالتنسيق التالي: https://gist.githubusercontent.com/user/id/raw/filename.json");
+        throw new Error("رابط Gist Raw غير صالح. تأكد من أنه بالتنسيق الصحيح وأنه لا يحتوي على رمز commit hash.");
     }
 
     const gistId = match[1];
