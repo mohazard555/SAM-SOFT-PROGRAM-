@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Config } from '../types';
 
+const CONFIG_STORAGE_KEY = 'samSoftConfig';
+
 export const useConfig = () => {
   const [config, setConfig] = useState<Config | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -8,11 +10,27 @@ export const useConfig = () => {
 
   useEffect(() => {
     const fetchConfig = async () => {
+      setLoading(true);
       const gistRawUrl = localStorage.getItem('gistRawUrl');
+      let configLoaded = false;
 
+      // 1. Try to load from localStorage cache first for an instant UI
+      try {
+        const cachedConfig = localStorage.getItem(CONFIG_STORAGE_KEY);
+        if (cachedConfig) {
+          setConfig(JSON.parse(cachedConfig));
+          setLoading(false); // Render with cached data immediately
+          configLoaded = true;
+        }
+      } catch (e) {
+        console.error("Failed to parse cached config from localStorage", e);
+        // Clear corrupted cache
+        localStorage.removeItem(CONFIG_STORAGE_KEY);
+      }
+      
+      // 2. If a Gist URL is configured, fetch the latest version to keep cache fresh
       if (gistRawUrl) {
         try {
-          // Append a timestamp to bypass cache
           const url = new URL(gistRawUrl);
           url.searchParams.set('_', new Date().getTime().toString());
           const response = await fetch(url.toString());
@@ -20,31 +38,36 @@ export const useConfig = () => {
             throw new Error(`Gist fetch error! status: ${response.status}`);
           }
           const data: Config = await response.json();
-          setConfig(data);
-          setLoading(false);
-          return; // Exit if Gist fetch is successful
-        } catch (e: unknown) {
-          console.error("Failed to fetch from Gist, falling back to local config.", e);
-          // Fallback to local config if Gist fetch fails
+          setConfig(data); // Update state with the freshest data
+          localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(data)); // Update cache
+          configLoaded = true;
+        } catch (e) {
+          console.error("Failed to fetch from Gist. Will rely on cached or local config if available.", e);
         }
       }
 
-      try {
-        const response = await fetch('/config.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data: Config = await response.json();
-        setConfig(data);
-      } catch (e: unknown) {
-        if (e instanceof Error) {
+      // 3. If nothing has been loaded yet (e.g., first visit, no cache, no gist), fall back to local config.json
+      if (!configLoaded) {
+        try {
+          const response = await fetch('/config.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data: Config = await response.json();
+          setConfig(data);
+          // Also cache the local config so it's available next time even if offline
+          localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(data));
+        } catch (e: unknown) {
+          if (e instanceof Error) {
             setError(e.message);
-        } else {
+          } else {
             setError('An unknown error occurred');
+          }
         }
-      } finally {
-        setLoading(false);
       }
+      
+      // Finally, set loading to false
+      setLoading(false);
     };
 
     fetchConfig();
@@ -110,6 +133,9 @@ export const useConfig = () => {
             const errorData = await response.json();
             throw new Error(`فشل تحديث Gist: ${errorData.message || response.status}`);
         }
+        
+        // On successful Gist update, also update the local cache
+        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(configToSave));
 
     } catch (e) {
         console.error("Failed to save config to Gist:", e);

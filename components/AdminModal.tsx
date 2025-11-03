@@ -414,6 +414,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
         )) {
             localStorage.removeItem('gistRawUrl');
             localStorage.removeItem('githubToken');
+            localStorage.removeItem('samSoftConfig');
             window.location.reload();
         }
     };
