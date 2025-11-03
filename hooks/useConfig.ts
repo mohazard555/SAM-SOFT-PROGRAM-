@@ -30,7 +30,7 @@ export const useConfig = () => {
 
       try {
         // First, try to fetch the local bootstrap config. This file tells us if there's a live Gist URL.
-        const bootstrapResponse = await fetch('/public/config.json');
+        const bootstrapResponse = await fetch('config.json');
         if (!bootstrapResponse.ok) {
             // If the local file itself is not found, this is a critical error unless we have a cache.
             throw new Error(`Could not load configuration file: ${bootstrapResponse.status}`);
