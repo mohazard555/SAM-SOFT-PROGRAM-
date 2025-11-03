@@ -98,6 +98,8 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [modalData, setModalData] = useState<{ title: string; content: string } | null>(null);
 
+  const hasInitialData = useMemo(() => config.categories && config.categories.length > 0, [config.categories]);
+
   const filteredCategories = useMemo(() => {
     const categories = config.categories || [];
     if (!searchQuery) {
@@ -165,12 +167,21 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
           <CategoryCard key={category.id} category={category} slugify={slugify} />
         ))}
       </motion.div>
-      {filteredCategories.length === 0 && (
+      
+      {!hasInitialData && (
+        <div className="text-center py-16 text-gray-500 dark:text-gray-500">
+            <p className="text-2xl font-bold">مرحباً بك في موقعك!</p>
+            <p className="mt-2">لم تتم إضافة أي فئات أو برامج بعد. ابدأ بإضافة المحتوى من خلال لوحة التحكم.</p>
+        </div>
+      )}
+
+      {hasInitialData && filteredCategories.length === 0 && (
         <div className="text-center py-16 text-gray-500 dark:text-gray-500">
             <p className="text-2xl">لا توجد نتائج</p>
             <p>حاول البحث بكلمات أخرى.</p>
         </div>
       )}
+
       <InfoModal 
         isOpen={!!modalData}
         onClose={() => setModalData(null)}
