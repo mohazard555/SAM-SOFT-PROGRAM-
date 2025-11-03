@@ -87,7 +87,7 @@ export const useConfig = () => {
     }
 
     const gistId = match[1];
-    const filename = match[2];
+    const filename = decodeURIComponent(match[2]);
 
     try {
         const response = await fetch(`https://api.github.com/gists/${gistId}`, {
