@@ -59,10 +59,11 @@ const App: React.FC = () => {
   };
   
   const handleSaveConfig = async () => {
+    if (!config) return;
     setToast({ message: 'جاري المزامنة...', type: 'loading' });
     try {
-        await saveConfig();
-        setToast({ message: 'تمت المزامنة بنجاح!', type: 'success' });
+        await saveConfig(config);
+        setToast({ message: 'تمت المزامنة بنجاح! قد تستغرق التغييرات بضع لحظات للظهور.', type: 'success' });
     } catch (err) {
         if (err instanceof Error) {
             setToast({ message: `فشل المزامنة: ${err.message}`, type: 'error' });

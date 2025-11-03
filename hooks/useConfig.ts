@@ -70,8 +70,8 @@ export const useConfig = () => {
     }
   }, [config]);
 
-  const saveConfig = useCallback(async () => {
-    if (!config) return;
+  const saveConfig = useCallback(async (configToSave: Config) => {
+    if (!configToSave) return;
 
     const gistRawUrl = localStorage.getItem('gistRawUrl');
     const githubToken = localStorage.getItem('githubToken');
@@ -100,7 +100,7 @@ export const useConfig = () => {
             body: JSON.stringify({
                 files: {
                     [filename]: {
-                        content: JSON.stringify(config, null, 2)
+                        content: JSON.stringify(configToSave, null, 2)
                     }
                 }
             })
@@ -120,7 +120,7 @@ export const useConfig = () => {
         }
     }
 
-  }, [config]);
+  }, []);
 
   return { config, loading, error, setConfig, exportConfig, saveConfig };
 };
