@@ -228,11 +228,11 @@ const AdminPanel: React.FC<{
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">رابط Gist Raw للمزامنة</label>
-                        <Input name="gistUrl" value={gistUrl} onChange={handleGistUrlChange} placeholder="https://gist.githubusercontent.com/..."/>
+                        <Input name="gistUrl" value={gistUrl} onChange={handleGistUrlChange} placeholder="https://gist.githubusercontent.com/..." autoComplete="off"/>
                     </div>
                     <div>
                         <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">GitHub Personal Access Token</label>
-                        <Input name="githubToken" type="password" value={githubToken} onChange={handleGithubTokenChange} placeholder="أدخل التوكن الخاص بك هنا"/>
+                        <Input name="githubToken" type="password" value={githubToken} onChange={handleGithubTokenChange} placeholder="أدخل التوكن الخاص بك هنا" autoComplete="off"/>
                     </div>
                 </div>
             </div>
@@ -428,6 +428,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
+                    autoComplete="username"
                 />
                 <Input
                     type="password"
@@ -435,6 +436,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                 />
                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                 <button
