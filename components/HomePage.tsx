@@ -99,14 +99,16 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
   const [modalData, setModalData] = useState<{ title: string; content: string } | null>(null);
 
   const filteredCategories = useMemo(() => {
+    const categories = config.categories || [];
     if (!searchQuery) {
-      return config.categories;
+      return categories;
     }
     const lowercasedQuery = searchQuery.toLowerCase();
     
-    return config.categories
+    return categories
       .map(category => {
-        const filteredPrograms = category.programs.filter(program =>
+        const programs = category.programs || [];
+        const filteredPrograms = programs.filter(program =>
           program.name.toLowerCase().includes(lowercasedQuery) ||
           program.shortDescription.toLowerCase().includes(lowercasedQuery)
         );
@@ -116,7 +118,7 @@ const HomePage: React.FC<HomePageProps> = ({ config, slugify }) => {
         }
         
         if (category.name.toLowerCase().includes(lowercasedQuery)) {
-          return category;
+          return { ...category, programs: programs };
         }
         
         return null;

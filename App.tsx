@@ -27,19 +27,6 @@ const App: React.FC = () => {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  const allPrograms: (Program & { categoryName: string })[] = config
-    ? config.categories.flatMap(category =>
-        category.programs.map(program => ({
-          ...program,
-          categoryName: category.name,
-        }))
-      )
-    : [];
-
-  const findProgramBySlug = (slug: string): (Program & { categoryName: string }) | undefined => {
-    return allPrograms.find(p => slugify(p.name) === slug);
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-white">
@@ -59,6 +46,17 @@ const App: React.FC = () => {
   if (!config) {
     return null;
   }
+  
+  const allPrograms: (Program & { categoryName: string })[] = (config.categories || []).flatMap(category =>
+    (category.programs || []).map(program => ({
+      ...program,
+      categoryName: category.name,
+    }))
+  );
+
+  const findProgramBySlug = (slug: string): (Program & { categoryName: string }) | undefined => {
+    return allPrograms.find(p => slugify(p.name) === slug);
+  };
   
   const handleSaveConfig = async () => {
     setToast({ message: 'جاري المزامنة...', type: 'loading' });
