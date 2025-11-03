@@ -407,6 +407,16 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
         e.preventDefault();
         onLogin({ username, password });
     };
+    
+    const handleResetSync = () => {
+        if (window.confirm(
+            'سيؤدي هذا إلى مسح إعدادات المزامنة مع Gist وتحميل الإعدادات من الملف المحلي الافتراضي. هل أنت متأكد؟'
+        )) {
+            localStorage.removeItem('gistRawUrl');
+            localStorage.removeItem('githubToken');
+            window.location.reload();
+        }
+    };
 
     return (
         <div className="p-8">
@@ -434,6 +444,14 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
                     دخول
                 </button>
             </form>
+            <div className="mt-4 text-center">
+                <button
+                    onClick={handleResetSync}
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:underline hover:text-blue-500"
+                >
+                    تواجه مشكلة في الدخول؟ اضغط هنا لإعادة تعيين المزامنة والتحميل من الملف المحلي.
+                </button>
+            </div>
         </div>
     );
 };
