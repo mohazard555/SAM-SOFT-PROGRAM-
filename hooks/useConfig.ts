@@ -11,63 +11,70 @@ export const useConfig = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       setLoading(true);
-      const gistRawUrl = localStorage.getItem('gistRawUrl');
-      let configLoaded = false;
-
-      // 1. Try to load from localStorage cache first for an instant UI
+      setError(null);
+      let loadedConfig: Config | null = null;
+      
+      // Attempt to load from cache for immediate UI rendering
       try {
         const cachedConfig = localStorage.getItem(CONFIG_STORAGE_KEY);
         if (cachedConfig) {
-          setConfig(JSON.parse(cachedConfig));
-          setLoading(false); // Render with cached data immediately
-          configLoaded = true;
+          loadedConfig = JSON.parse(cachedConfig);
+          setConfig(loadedConfig);
         }
       } catch (e) {
         console.error("Failed to parse cached config from localStorage", e);
-        // Clear corrupted cache
         localStorage.removeItem(CONFIG_STORAGE_KEY);
       }
       
-      // 2. If a Gist URL is configured, fetch the latest version to keep cache fresh
-      if (gistRawUrl) {
-        try {
-          const url = new URL(gistRawUrl);
-          url.searchParams.set('_', new Date().getTime().toString());
-          const response = await fetch(url.toString());
-          if (!response.ok) {
-            throw new Error(`Gist fetch error! status: ${response.status}`);
-          }
-          const data: Config = await response.json();
-          setConfig(data); // Update state with the freshest data
-          localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(data)); // Update cache
-          configLoaded = true;
-        } catch (e) {
-          console.error("Failed to fetch from Gist. Will rely on cached or local config if available.", e);
-        }
-      }
+      let bootstrapConfig: any = null;
 
-      // 3. If nothing has been loaded yet (e.g., first visit, no cache, no gist), fall back to local config.json
-      if (!configLoaded) {
-        try {
-          const response = await fetch('/config.json');
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data: Config = await response.json();
-          setConfig(data);
-          // Also cache the local config so it's available next time even if offline
-          localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(data));
-        } catch (e: unknown) {
-          if (e instanceof Error) {
-            setError(e.message);
-          } else {
-            setError('An unknown error occurred');
-          }
+      try {
+        // First, try to fetch the local bootstrap config. This file tells us if there's a live Gist URL.
+        const bootstrapResponse = await fetch('/public/config.json');
+        if (!bootstrapResponse.ok) {
+            // If the local file itself is not found, this is a critical error unless we have a cache.
+            throw new Error(`Could not load configuration file: ${bootstrapResponse.status}`);
         }
+        
+        bootstrapConfig = await bootstrapResponse.json();
+        const gistRawUrl = bootstrapConfig.gistRawUrl;
+
+        let liveConfig: Config;
+        
+        // If a valid Gist URL is provided, fetch the live config from there.
+        if (gistRawUrl && typeof gistRawUrl === 'string' && gistRawUrl.trim() !== '') {
+            const url = new URL(gistRawUrl); // Gist URLs are absolute
+            url.searchParams.set('_', new Date().getTime().toString()); // Cache bust
+            const mainResponse = await fetch(url.toString());
+            if (!mainResponse.ok) {
+              // If Gist fetch fails, we'll fall back to the bootstrapConfig.
+              console.warn(`Failed to fetch from Gist ${gistRawUrl}: ${mainResponse.status}. Falling back to local config.`);
+              liveConfig = bootstrapConfig;
+            } else {
+              liveConfig = await mainResponse.json();
+            }
+        } else {
+            // If no Gist URL, the bootstrap config is our main config.
+            liveConfig = bootstrapConfig;
+        }
+
+        setConfig(liveConfig);
+        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(liveConfig));
+
+      } catch (e) {
+        console.error("Configuration loading failed.", e);
+        // If any fetch fails and we don't have a cached config, show an error.
+        if (!loadedConfig) {
+             if (e instanceof Error) {
+                setError(e.message);
+            } else {
+                setError('An unknown error occurred');
+            }
+        }
+        // If we have a cached config (`loadedConfig`), we'll just stick with that.
+      } finally {
+        setLoading(false);
       }
-      
-      // Finally, set loading to false
-      setLoading(false);
     };
 
     fetchConfig();

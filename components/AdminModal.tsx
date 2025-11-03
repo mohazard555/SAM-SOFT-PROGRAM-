@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, AdminCredentials, Category, Program, Ad } from '../types';
@@ -220,14 +219,25 @@ const AdminPanel: React.FC<{
             
             <div className="bg-gray-100 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><SyncIcon /> <span>المزامنة عبر الإنترنت</span></h3>
-                <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1 mb-4 p-3 bg-gray-200 dark:bg-gray-900/50 rounded-md">
-                    <p>1. الصق <b>Gist Raw URL</b> في الحقل الأول ليكون مصدر بيانات الموقع.</p>
-                    <p>2. أنشئ <b>Personal Access Token (Classic)</b> من إعدادات GitHub مع صلاحية `gist` فقط.</p>
-                    <p>3. الصق الـ <b>Token</b> في الحقل الثاني لتمكين الحفظ والمزامنة.</p>
+                <div className="text-sm text-gray-600 dark:text-gray-400 space-y-4">
+                    <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-md border border-yellow-500/50">
+                        <p className="font-bold text-yellow-800 dark:text-yellow-300">خطوة هامة لنشر التغييرات:</p>
+                        <p className="mt-1">
+                            لجعل تعديلاتك تظهر لجميع الزوار، يجب عليك وضع رابط Gist Raw العام في الملف 
+                            <code className="bg-gray-500/20 px-1 py-0.5 rounded text-xs mx-1">public/config.json</code>
+                            داخل حقل 
+                            <code className="bg-gray-500/20 px-1 py-0.5 rounded text-xs mx-1">"gistRawUrl"</code>.
+                        </p>
+                    </div>
+                    <div className="p-3 bg-gray-200 dark:bg-gray-900/50 rounded-md">
+                        <p className="font-semibold mb-2">إعدادات الحفظ (لهذا المتصفح فقط):</p>
+                        <p>1. أنشئ <b className="text-gray-800 dark:text-gray-200">Personal Access Token (Classic)</b> من GitHub مع صلاحية `gist`.</p>
+                        <p>2. أدخل رابط Gist Raw و الـ Token أدناه لتمكين زر "حفظ ومزامنة" من هذه اللوحة.</p>
+                    </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 mt-4">
                     <div>
-                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">رابط Gist Raw للمزامنة</label>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">رابط Gist Raw (للحفظ)</label>
                         <Input name="gistUrl" value={gistUrl} onChange={handleGistUrlChange} placeholder="https://gist.githubusercontent.com/..." autoComplete="off"/>
                     </div>
                     <div>
