@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, Category, Program } from '../types';
-import { SearchIcon, CategoryIcon, InfoIcon, MessageCircleIcon, ChevronDownIcon } from './Icons';
+import { SearchIcon, CategoryIcon, InfoIcon, MessageCircleIcon, ChevronDownIcon, PlusCircleIcon, MinusCircleIcon } from './Icons';
 import InfoModal from './InfoModal';
 
 interface HomePageProps {
@@ -28,6 +28,14 @@ const ProgramItem: React.FC<{ program: Program; slug: string }> = ({ program, sl
 
 const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => string }> = ({ category, slugify }) => {
     const [isOpen, setIsOpen] = useState(true);
+    const [isProgramsExpanded, setIsProgramsExpanded] = useState(false);
+
+    const INITIAL_VISIBLE_PROGRAMS = 3;
+    const hasMorePrograms = category.programs.length > INITIAL_VISIBLE_PROGRAMS;
+
+    const programsToShow = hasMorePrograms && !isProgramsExpanded
+        ? category.programs.slice(0, INITIAL_VISIBLE_PROGRAMS)
+        : category.programs;
 
     return (
         <motion.div
@@ -61,13 +69,24 @@ const CategoryCard: React.FC<{ category: Category; slugify: (text: string) => st
                         collapsed: { opacity: 0, height: 0 }
                     }}
                     transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
-                    className="overflow-hidden"
+                    className="overflow-hidden flex-grow flex flex-col"
                 >
                     <div className="p-6 space-y-4 flex-grow">
-                        {category.programs.map(program => (
+                        {programsToShow.map(program => (
                             <ProgramItem key={program.id} program={program} slug={slugify(program.name)} />
                         ))}
                     </div>
+                     {hasMorePrograms && (
+                        <div className="border-t border-gray-200 dark:border-[#30363d] px-6 py-2 bg-gray-50/50 dark:bg-gray-800/20">
+                             <button
+                                onClick={() => setIsProgramsExpanded(!isProgramsExpanded)}
+                                className="w-full text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center justify-center gap-1.5 p-1 rounded-md transition-colors"
+                            >
+                                {isProgramsExpanded ? <MinusCircleIcon /> : <PlusCircleIcon />}
+                                <span>{isProgramsExpanded ? 'عرض أقل' : `عرض الكل (${category.programs.length})`}</span>
+                            </button>
+                        </div>
+                    )}
                 </motion.div>
             )}
             </AnimatePresence>
