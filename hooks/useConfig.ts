@@ -126,15 +126,13 @@ export const useConfig = () => {
 
     try {
       const configString = JSON.stringify(config, null, 2);
-      const blob = new Blob([configString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(configString);
       const a = document.createElement('a');
-      a.href = url;
+      a.href = dataUrl;
       a.download = 'config.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     } catch (e) {
         console.error("Failed to save config:", e)
         alert("فشل حفظ الإعدادات. انظر إلى الكونسول للمزيد من التفاصيل.")

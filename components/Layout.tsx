@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Config, Ad } from '../types';
 import { AdminIcon, CloseIcon, SunIcon, MoonIcon } from './Icons';
@@ -24,23 +24,30 @@ const ThemeToggleButton: React.FC = () => {
     );
 };
 
-const Header: React.FC<LayoutProps> = ({ config, onAdminClick }) => (
+const Header: React.FC<LayoutProps & { isAdminIconVisible: boolean, onLogoClick: (e: React.MouseEvent) => void }> = ({ config, onAdminClick, isAdminIconVisible, onLogoClick }) => (
   <header className="bg-white/80 dark:bg-[#161b22]/80 backdrop-blur-sm border-b border-gray-200 dark:border-[#30363d] sticky top-0 z-40">
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between h-20">
-        <Link to="/" className="flex items-center gap-4">
+        <Link to="/" className="flex items-center gap-4" onClick={onLogoClick}>
           {config.siteLogo && <img src={config.siteLogo} alt="Logo" className="h-10 w-10 object-contain"/>}
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-wider">{config.siteName}</h1>
         </Link>
         <div className="flex items-center gap-2">
             <ThemeToggleButton />
-            <button
-              onClick={onAdminClick}
-              className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Admin Panel"
-            >
-              <AdminIcon />
-            </button>
+            <AnimatePresence>
+            {isAdminIconVisible && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                onClick={onAdminClick}
+                className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Admin Panel"
+              >
+                <AdminIcon />
+              </motion.button>
+            )}
+            </AnimatePresence>
         </div>
       </div>
     </div>
@@ -124,9 +131,53 @@ const AdBanner: React.FC<AdBannerProps> = ({ ads }) => {
 
 
 const Layout: React.FC<LayoutProps> = ({ config, onAdminClick }) => {
+  const [isAdminIconVisible, setIsAdminIconVisible] = useState(false);
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<number | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (sessionStorage.getItem('adminUnlocked') === 'true') {
+      setIsAdminIconVisible(true);
+    }
+  }, []);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    clickCountRef.current += 1;
+
+    if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+    }
+
+    if (clickCountRef.current >= 5) {
+        setIsAdminIconVisible(true);
+        sessionStorage.setItem('adminUnlocked', 'true');
+        clickCountRef.current = 0; // Reset
+    } else {
+        clickTimerRef.current = window.setTimeout(() => {
+            // After the timeout, if it was just one click, navigate to home.
+            if (clickCountRef.current === 1) {
+                navigate('/');
+            }
+            // Reset count after timeout.
+            clickCountRef.current = 0;
+        }, 300); // 300ms window for multi-click vs single-click
+    }
+  };
+
+  useEffect(() => {
+    // Cleanup timer on component unmount
+    return () => {
+        if (clickTimerRef.current) {
+            clearTimeout(clickTimerRef.current);
+        }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0d1117] text-gray-800 dark:text-gray-200 font-sans flex flex-col">
-      <Header config={config} onAdminClick={onAdminClick} />
+      <Header config={config} onAdminClick={onAdminClick} isAdminIconVisible={isAdminIconVisible} onLogoClick={handleLogoClick}/>
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>

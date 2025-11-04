@@ -430,7 +430,7 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
     };
 
     return (
-        <div className="p-8">
+        <div className="p-8 relative">
             <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">تسجيل دخول المدير</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
@@ -457,14 +457,14 @@ const AdminLogin: React.FC<{ onLogin: (credentials: AdminCredentials) => void; e
                     دخول
                 </button>
             </form>
-            <div className="mt-4 text-center">
-                <button
-                    onClick={handleResetSync}
-                    className="text-xs text-gray-500 dark:text-gray-400 hover:underline hover:text-blue-500"
-                >
-                    تواجه مشكلة في الدخول؟ اضغط هنا لإعادة تعيين المزامنة والتحميل من الملف المحلي.
-                </button>
-            </div>
+            <button
+                onClick={handleResetSync}
+                className="absolute bottom-4 left-4 p-2 text-gray-400 dark:text-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-blue-500 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                title="إعادة تعيين المزامنة والتحميل من الملف المحلي"
+                aria-label="إعادة تعيين المزامنة"
+            >
+                <SyncIcon />
+            </button>
         </div>
     );
 };
