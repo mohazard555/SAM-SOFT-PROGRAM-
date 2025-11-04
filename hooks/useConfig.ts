@@ -142,7 +142,16 @@ export const useConfig = () => {
     }
 
     const gistId = match[1];
-    const filename = decodeURIComponent(match[2]);
+    let filename = match[2];
+
+    // Keep decoding filename until it's clean to handle multiple layers of encoding (e.g., from copy-pasting)
+    try {
+        while (filename !== decodeURIComponent(filename)) {
+            filename = decodeURIComponent(filename);
+        }
+    } catch (e) {
+        console.warn('Error while decoding filename from Gist URL, using as-is.', e);
+    }
 
     try {
         const response = await fetch(`https://api.github.com/gists/${gistId}`, {
