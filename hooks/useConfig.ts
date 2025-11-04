@@ -4,6 +4,22 @@ import type { Config } from '../types';
 
 const CONFIG_STORAGE_KEY = 'samSoftConfig';
 
+// Helper function to add a timeout to fetch requests
+const fetchWithTimeout = async (resource: RequestInfo, options: RequestInit & { timeout?: number } = {}) => {
+  const { timeout = 10000 } = options; // 10-second timeout
+
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  const response = await fetch(resource, {
+    ...options,
+    signal: controller.signal,
+  });
+
+  clearTimeout(id);
+  return response;
+};
+
 export const useConfig = () => {
   const [config, setInternalConfig] = useState<Config | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,7 +61,9 @@ export const useConfig = () => {
           
           const url = new URL(urlWithCommitRemoved);
           url.searchParams.set('_', new Date().getTime().toString());
-          const mainResponse = await fetch(url.toString(), { cache: 'reload' });
+          
+          // Use fetch with timeout to prevent hanging
+          const mainResponse = await fetchWithTimeout(url.toString(), { cache: 'reload', timeout: 10000 });
 
           if (mainResponse.ok) {
             const liveConfig = await mainResponse.json();
