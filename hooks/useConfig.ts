@@ -41,8 +41,7 @@ export const useConfig = () => {
         const gistRawUrl = bootstrapConfig.gistRawUrl;
 
         if (gistRawUrl && typeof gistRawUrl === 'string' && gistRawUrl.trim() !== '') {
-          const decodedGistUrl = decodeURIComponent(gistRawUrl);
-          const urlWithCommitRemoved = decodedGistUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+          const urlWithCommitRemoved = gistRawUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
           
           const url = new URL(urlWithCommitRemoved);
           url.searchParams.set('_', new Date().getTime().toString());
@@ -134,8 +133,7 @@ export const useConfig = () => {
         throw new Error("لم يتم تكوين المزامنة. يرجى إدخال رابط Gist Raw و GitHub Token في إعدادات المزامنة.");
     }
 
-    const decodedGistUrl = decodeURIComponent(gistRawUrlFromStorage);
-    const gistUrlForApi = decodedGistUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+    const gistUrlForApi = gistRawUrlFromStorage.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
     
     const match = gistUrlForApi.match(/https:\/\/gist\.githubusercontent\.com\/[^\/]+\/([a-fA-F0-9]+)\/raw\/(.*)$/);
 
@@ -144,7 +142,7 @@ export const useConfig = () => {
     }
 
     const gistId = match[1];
-    const filename = match[2];
+    const filename = decodeURIComponent(match[2]);
 
     try {
         const response = await fetch(`https://api.github.com/gists/${gistId}`, {
