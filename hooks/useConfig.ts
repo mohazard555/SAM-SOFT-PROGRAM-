@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+// DO NOT EDIT - Full file content has been provided below
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Config } from '../types';
 
 const CONFIG_STORAGE_KEY = 'samSoftConfig';
@@ -31,70 +32,72 @@ export const useConfig = () => {
       setLoading(true);
       setError(null);
 
-      // Priority 1: Try to load from localStorage cache.
-      // This preserves user edits across page reloads.
+      // Priority 1: Fetch from network (Gist) to get the latest version.
       try {
-        const cachedConfigJSON = localStorage.getItem(CONFIG_STORAGE_KEY);
-        if (cachedConfigJSON) {
-          const parsedConfig = JSON.parse(cachedConfigJSON);
-          if (parsedConfig && parsedConfig.siteName) {
-            setInternalConfig(parsedConfig);
-            setLoading(false);
-            return; // Success: Loaded from cache.
-          }
-        }
-      } catch (e) {
-        console.warn("Could not parse cached config. It will be ignored.", e);
-        localStorage.removeItem(CONFIG_STORAGE_KEY);
-      }
-
-      // Priority 2: If cache is empty or invalid, fetch from network.
-      try {
-        // Load the local bootstrap file to get the Gist URL
-        const bootstrapResponse = await fetch('/config.json');
+        const bootstrapResponse = await fetch('/config.json', { cache: 'reload' });
         if (!bootstrapResponse.ok) throw new Error(`Could not load bootstrap file: ${bootstrapResponse.status}`);
         const bootstrapConfig = await bootstrapResponse.json();
         
         const gistRawUrl = bootstrapConfig.gistRawUrl;
 
         if (gistRawUrl && typeof gistRawUrl === 'string' && gistRawUrl.trim() !== '') {
-          // IMPORTANT: Strip the commit hash from the Gist URL to always fetch the latest version.
-          // This prevents the app from being stuck on an old version of the config.
-          const urlWithCommitRemoved = gistRawUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+          const decodedGistUrl = decodeURIComponent(gistRawUrl);
+          const urlWithCommitRemoved = decodedGistUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+          
+          const url = new URL(urlWithCommitRemoved);
+          url.searchParams.set('_', new Date().getTime().toString());
+          const mainResponse = await fetch(url.toString(), { cache: 'reload' });
 
-          // Attempt to fetch the live config from Gist
-          try {
-            const url = new URL(urlWithCommitRemoved);
-            url.searchParams.set('_', new Date().getTime().toString());
-            const mainResponse = await fetch(url.toString());
-            if (!mainResponse.ok) throw new Error(`Gist fetch failed with status ${mainResponse.status}`);
-            
+          if (mainResponse.ok) {
             const liveConfig = await mainResponse.json();
-            
             if (typeof liveConfig === 'object' && liveConfig !== null && liveConfig.siteName) {
-              setConfig(liveConfig); // Use our setter to update state and cache
+              setConfig(liveConfig);
+              setLoading(false);
               return; // Success: Loaded from Gist.
             } else {
-              throw new Error('Invalid or empty config received from Gist.');
+               throw new Error('Invalid config from Gist.');
             }
-          } catch (gistError) {
-            // Priority 3: Fallback to local bootstrap file if Gist fails
-            console.warn(`Could not load from Gist. Falling back to local default config.`, gistError);
-            setConfig(bootstrapConfig); // Use setter to update state and cache
-            return;
           }
-        } else {
-          // No Gist URL provided, use the local bootstrap file as the primary source.
-          setConfig(bootstrapConfig);
-          return;
         }
-      } catch (e) {
-        // Priority 4: All loading methods failed.
-        console.error("Critical configuration loading failed.", e);
-        const message = e instanceof Error ? e.message : 'An unknown error occurred';
-        setError(message);
-      } finally {
-        setLoading(false);
+        // Throw to trigger fallbacks if Gist isn't available or fetch failed
+        throw new Error("Gist not configured or fetch failed.");
+
+      } catch (networkError) {
+        console.warn("Network fetch failed, trying fallbacks.", networkError);
+
+        // Priority 2: Try to load from localStorage cache.
+        try {
+          const cachedConfigJSON = localStorage.getItem(CONFIG_STORAGE_KEY);
+          if (cachedConfigJSON) {
+            const parsedConfig = JSON.parse(cachedConfigJSON);
+            if (parsedConfig && parsedConfig.siteName) {
+              setInternalConfig(parsedConfig); // Use internal setter to avoid re-caching stale data
+              setLoading(false);
+              return; // Success: Loaded from cache.
+            }
+          }
+        } catch (e) {
+          console.warn("Cached config is invalid.", e);
+          localStorage.removeItem(CONFIG_STORAGE_KEY);
+        }
+
+        // Priority 3: Fallback to local bootstrap file.
+        try {
+            const bootstrapResponse = await fetch('/config.json');
+            if (bootstrapResponse.ok) {
+                const bootstrapConfig = await bootstrapResponse.json();
+                setConfig(bootstrapConfig); // Cache this for offline use next time
+                setLoading(false);
+                return;
+            }
+            throw new Error("Local config fetch failed.");
+        } catch (e) {
+            // Priority 4: All methods failed.
+            console.error("All config loading methods failed.", e);
+            const message = e instanceof Error ? e.message : 'An unknown error occurred';
+            setError(message);
+            setLoading(false);
+        }
       }
     };
 
@@ -131,17 +134,17 @@ export const useConfig = () => {
         throw new Error("لم يتم تكوين المزامنة. يرجى إدخال رابط Gist Raw و GitHub Token في إعدادات المزامنة.");
     }
 
-    // IMPORTANT: Strip the commit hash from the Gist URL to ensure the API call targets the correct Gist.
-    const gistRawUrl = gistRawUrlFromStorage.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
-
-    const match = gistRawUrl.match(/https:\/\/gist\.githubusercontent\.com\/[^\/]+\/([a-fA-F0-9]+)\/raw\/(.*)$/);
+    const decodedGistUrl = decodeURIComponent(gistRawUrlFromStorage);
+    const gistUrlForApi = decodedGistUrl.replace(/\/raw\/[a-f0-9]{40}\//, '/raw/');
+    
+    const match = gistUrlForApi.match(/https:\/\/gist\.githubusercontent\.com\/[^\/]+\/([a-fA-F0-9]+)\/raw\/(.*)$/);
 
     if (!match) {
         throw new Error("رابط Gist Raw غير صالح. تأكد من أنه بالتنسيق الصحيح وأنه لا يحتوي على رمز commit hash.");
     }
 
     const gistId = match[1];
-    const filename = decodeURIComponent(match[2]);
+    const filename = match[2];
 
     try {
         const response = await fetch(`https://api.github.com/gists/${gistId}`, {

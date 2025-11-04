@@ -13,14 +13,18 @@ interface HomePageProps {
 const ProgramItem: React.FC<{ program: Program; slug: string }> = ({ program, slug }) => {
     return (
         <Link to={`/program/${slug}`} className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group">
-            <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium text-blue-600 dark:text-blue-400 group-hover:underline">{program.name}</span>
-                {program.badge && (
-                    <span className="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded-full">
-                        {program.badge}
-                    </span>
-                )}
-                <span className="text-sm text-gray-500 dark:text-gray-500">- {program.shortDescription}</span>
+            <div>
+                <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600 dark:text-blue-400 group-hover:underline">{program.name}</span>
+                    {program.badge && (
+                        <span className="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded-full">
+                            {program.badge}
+                        </span>
+                    )}
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                    - {program.shortDescription}
+                </p>
             </div>
         </Link>
     );
